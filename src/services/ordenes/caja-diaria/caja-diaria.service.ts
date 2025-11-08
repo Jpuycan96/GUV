@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 // ========== INTERFACES ==========
 export interface CajaDiariaDTO {
@@ -90,7 +91,7 @@ export interface CierreCajaRequest {
   providedIn: 'root'
 })
 export class CajaDiariaService {
-  private apiUrl = 'http://localhost:8080/api/cajas'; // ⬅️ AJUSTA ESTA URL
+  private apiUrl = `${environment.apiUrl}/cajas`;
 
   constructor(private http: HttpClient) { }
 
@@ -159,10 +160,7 @@ export class CajaDiariaService {
   }
 
   // ========== RECALCULAR TOTALES ==========
-
   recalcularTotales(idCaja: number): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/${idCaja}/recalcular`, {});
   }
-
-  
 }
