@@ -1,0 +1,350 @@
+/* Expansion Panel */
+.procesos-section {
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+mat-expansion-panel-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+}
+
+mat-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+}
+
+.section-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+mat-panel-description {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Contenido del panel */
+.panel-content {
+  padding: 24px;
+}
+
+.actions-header {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Resto de estilos (mantén los que ya tienes) */
+.alert {
+  padding: 12px 16px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.alert-error {
+  background-color: #ffebee;
+  color: #c62828;
+  border-left: 4px solid #c62828;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 16px;
+}
+
+/* ... (mantén el resto de tus estilos) */
+/* Contenedor principal */
+.procesos-section {
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Header */
+mat-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 4px 4px 0 0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.header-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Contenido */
+mat-card-content {
+  padding: 24px;
+}
+
+/* Alerts */
+.alert {
+  padding: 12px 16px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.alert-error {
+  background-color: #ffebee;
+  color: #c62828;
+  border-left: 4px solid #c62828;
+}
+
+/* Loading */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 16px;
+}
+
+/* Selector de procesos disponibles */
+.selector-procesos {
+  margin-bottom: 24px;
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+.selector-procesos h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px 0;
+  color: #424242;
+  font-size: 16px;
+}
+
+.procesos-disponibles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.proceso-disponible {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.proceso-disponible:hover {
+  background-color: #667eea;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Lista de procesos */
+.procesos-lista {
+  margin-top: 16px;
+}
+
+.lista-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.lista-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #424242;
+  font-size: 16px;
+}
+
+.orden-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Item de proceso */
+.proceso-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.proceso-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #667eea;
+}
+
+.proceso-orden {
+  flex-shrink: 0;
+}
+
+.proceso-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.proceso-nombre {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
+
+.proceso-nombre mat-icon {
+  color: #667eea;
+}
+
+.proceso-descripcion {
+  color: #757575;
+  font-size: 14px;
+  margin-left: 32px;
+}
+
+.proceso-tiempo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #9e9e9e;
+  font-size: 13px;
+  margin-left: 32px;
+}
+
+.small-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.chip-small {
+  height: 24px;
+  font-size: 12px;
+}
+
+.proceso-orden-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.proceso-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Estado vacío */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 72px;
+  width: 72px;
+  height: 72px;
+  color: #bdbdbd;
+  margin-bottom: 16px;
+}
+
+.empty-state p {
+  color: #757575;
+  font-size: 16px;
+  margin-bottom: 24px;
+}
+
+.empty-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.or-text {
+  font-size: 14px;
+  color: #9e9e9e;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .proceso-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .proceso-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .lista-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .procesos-disponibles {
+    flex-direction: column;
+  }
+
+  .proceso-disponible {
+    width: 100%;
+  }
+}

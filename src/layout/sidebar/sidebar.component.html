@@ -1,0 +1,104 @@
+<nav class="sidebar" [class.collapsed]="collapsed">
+  
+  <!-- Logo section -->
+  <div class="sidebar-logo" *ngIf="!collapsed">
+    <img src="/logoUV.png" alt="Gigantografías UV" class="logo-img">
+    <span class="logo-text">Giganto<span class="logo-highlight">grafías</span></span>
+  </div>
+
+  <hr class="sidebar-divider">
+
+  <!-- Menu items -->
+  <mat-nav-list class="menu-list">
+    <ng-container *ngFor="let item of menuItems">
+      
+      <!-- Solo mostrar si tiene permisos -->
+      <ng-container *ngIf="mostrarItem(item)">
+        
+        <!-- Menú simple (sin hijos) -->
+        <a mat-list-item
+           *ngIf="!item.children"
+           [routerLink]="item.route"
+           routerLinkActive="active"
+           [matTooltip]="collapsed ? item.label : ''"
+           matTooltipPosition="right"
+           class="menu-item">
+          
+          <mat-icon [class]="'menu-icon ' + (item.color || '')">
+            {{ item.icon }}
+          </mat-icon>
+          
+          <span class="menu-label" *ngIf="!collapsed">
+            {{ item.label }}
+          </span>
+        </a>
+
+        <!-- Menú con submenú (expandible) -->
+        <mat-expansion-panel *ngIf="item.children && !collapsed" class="submenu-panel">
+          <mat-expansion-panel-header class="menu-item">
+            <mat-panel-title>
+              <mat-icon class="menu-icon">{{ item.icon }}</mat-icon>
+              <span class="menu-label">{{ item.label }}</span>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          
+          <ng-container *ngFor="let child of item.children">
+            <a mat-list-item
+               *ngIf="mostrarItem(child)"
+               [routerLink]="child.route"
+               routerLinkActive="active"
+               class="submenu-item">
+              <mat-icon class="submenu-icon">{{ child.icon }}</mat-icon>
+              <span class="submenu-label">{{ child.label }}</span>
+            </a>
+          </ng-container>
+        </mat-expansion-panel>
+
+        <!-- Menú colapsado con hijos (mostrar solo ícono con tooltip) -->
+        <a mat-list-item
+           *ngIf="item.children && collapsed"
+           [matTooltip]="item.label"
+           matTooltipPosition="right"
+           class="menu-item">
+          <mat-icon class="menu-icon">{{ item.icon }}</mat-icon>
+        </a>
+
+      </ng-container>
+
+    </ng-container>
+  </mat-nav-list>
+
+  <!-- Footer info -->
+  <div class="sidebar-footer">
+    <hr class="sidebar-divider">
+    
+    <!-- Usuario (siempre visible) -->
+    <div class="user-section" *ngIf="user?.isAuthenticated">
+      <div class="user-info" *ngIf="!collapsed">
+        <mat-icon class="user-avatar">account_circle</mat-icon>
+        <div class="user-details">
+          <span class="user-name">{{ user?.username }}</span>
+          <span class="user-role">{{ user?.roles?.[0] || 'Usuario' }}</span>
+        </div>
+      </div>
+      
+      <mat-icon class="user-avatar-collapsed" *ngIf="collapsed">account_circle</mat-icon>
+    </div>
+
+    <!-- Botón cerrar sesión -->
+    <button mat-button 
+            class="logout-btn" 
+            (click)="logout()"
+            [matTooltip]="collapsed ? 'Cerrar sesión' : ''"
+            matTooltipPosition="right">
+      <mat-icon>logout</mat-icon>
+      <span *ngIf="!collapsed">Cerrar sesión</span>
+    </button>
+    
+    <!-- Versión -->
+    <div class="version-info" *ngIf="!collapsed">
+      <span>v1.0.0</span>
+    </div>
+  </div>
+
+</nav>

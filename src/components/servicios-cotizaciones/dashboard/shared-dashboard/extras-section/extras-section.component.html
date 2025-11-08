@@ -1,0 +1,125 @@
+<mat-card class="extras-section">
+  <!-- Header -->
+  <mat-card-header>
+    <div class="header-left">
+      <mat-card-title>
+        <mat-icon class="section-icon">star</mat-icon>
+        Extras
+      </mat-card-title>
+    </div>
+    <div class="header-right">
+      <button mat-icon-button (click)="recargar()" matTooltip="Recargar">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-raised-button color="primary" (click)="abrirModalAgregarExtra()" matTooltip="Agregar extra">
+        <mat-icon>add</mat-icon>
+        Agregar Extra
+      </button>
+    </div>
+  </mat-card-header>
+
+  <!-- Contenido -->
+  <mat-card-content>
+    <!-- Mensaje de error -->
+    <div *ngIf="error" class="alert alert-error">
+      <mat-icon>error</mat-icon>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="cargando" class="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando extras...</p>
+    </div>
+
+    <!-- Lista de extras con expansion panels -->
+    <mat-accordion *ngIf="!cargando && extrasConDetalles.length > 0">
+      <mat-expansion-panel *ngFor="let extraInfo of extrasConDetalles" class="extra-panel">
+        
+        <!-- Header del panel -->
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-icon class="extra-icon">extension</mat-icon>
+            <strong>{{ extraInfo.extra.nombre }}</strong>
+            <mat-chip [color]="obtenerColorTipo(extraInfo.extra.tipo)" selected class="tipo-chip">
+              {{ extraInfo.extra.tipo || 'General' }}
+            </mat-chip>
+          </mat-panel-title>
+          <mat-panel-description>
+            {{ extraInfo.detalles.length }} configuración(es) de precio
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <!-- Contenido expandido -->
+        <div class="extra-content">
+          
+          <!-- Acciones del extra -->
+          <div class="extra-actions">
+            <button mat-raised-button color="primary" (click)="abrirModalDetalle(extraInfo)">
+              <mat-icon>add</mat-icon>
+              Agregar Detalle de Precio
+            </button>
+            <button mat-raised-button color="warn" (click)="eliminarExtra(extraInfo.servicioExtra.idServicioExtra)">
+              <mat-icon>delete</mat-icon>
+              Eliminar Extra
+            </button>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <!-- Lista de detalles de precio -->
+          <div class="detalles-container">
+            <h3 class="detalles-title">
+              <mat-icon>attach_money</mat-icon>
+              Configuraciones de Precio
+            </h3>
+
+            <div *ngIf="extraInfo.detalles.length > 0" class="detalles-list">
+              <div *ngFor="let detalle of extraInfo.detalles" class="detalle-item">
+                <div class="detalle-info">
+                  <div class="detalle-rango">
+                    <mat-icon class="small-icon">bar_chart</mat-icon>
+                    {{ formatearRango(detalle) }}
+                  </div>
+                  <div class="detalle-precio">
+                    <span class="precio-amount">${{ detalle.precioExtraBase }}</span>
+                    <span class="precio-unit">/ {{ detalle.unidadBaseExtra || 'unidad' }}</span>
+                  </div>
+                </div>
+                <div class="detalle-actions">
+                  <button mat-icon-button (click)="abrirModalDetalle(extraInfo, detalle)" 
+                          matTooltip="Editar" color="primary">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="eliminarDetalle(detalle.idExtraDetalle)" 
+                          matTooltip="Eliminar" color="warn">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="extraInfo.detalles.length === 0" class="empty-detalles">
+              <mat-icon>info</mat-icon>
+              <p>No hay configuraciones de precio para este extra</p>
+              <button mat-button color="primary" (click)="abrirModalDetalle(extraInfo)">
+                Agregar primera configuración
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+
+    <!-- Estado vacío -->
+    <div *ngIf="!cargando && extrasConDetalles.length === 0" class="empty-state">
+      <mat-icon class="empty-icon">inbox</mat-icon>
+      <p>No hay extras agregados a este servicio</p>
+      <button mat-raised-button color="primary" (click)="abrirModalAgregarExtra()">
+        <mat-icon>add</mat-icon>
+        Agregar primer extra
+      </button>
+    </div>
+  </mat-card-content>
+</mat-card>

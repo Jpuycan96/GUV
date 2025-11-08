@@ -31,7 +31,8 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+    // Cambiado: siempre navegar a /home después del login, a menos que haya un returnUrl específico
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
     
     if (this.authService.isAuthenticated()) {
       this.router.navigate([this.returnUrl]);
@@ -58,7 +59,8 @@ export class LoginComponent implements OnInit {
     this.authService.login(credentials).subscribe({
       next: (response) => {
         console.log('Login exitoso:', response);
-        this.router.navigate([this.returnUrl]);
+        // Navegación explícita a /home
+        this.router.navigate(['/home']);
       },
       error: (error) => {
         console.error('Error en login:', error);
@@ -81,3 +83,4 @@ export class LoginComponent implements OnInit {
     }
   }
 }
+

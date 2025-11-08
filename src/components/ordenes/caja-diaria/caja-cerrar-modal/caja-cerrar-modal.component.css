@@ -1,0 +1,346 @@
+.modal-container {
+  max-width: 600px;
+  width: 100%;
+}
+
+/* ========== HEADER ========== */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  background: linear-gradient(135deg, #d32f2f 0%, #f44336 100%);
+}
+
+.modal-header h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.5rem;
+  color: white;
+}
+
+.header-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  color: white;
+}
+
+.close-button {
+  color: white;
+}
+
+/* ========== CONTENT ========== */
+.modal-content {
+  padding: 24px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* ========== INFO CAJA ========== */
+.caja-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-row .label {
+  font-size: 0.875rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.info-row .value {
+  font-size: 0.875rem;
+  color: #333;
+  font-weight: 600;
+}
+
+/* ========== TOTALES DEL SISTEMA ========== */
+.totales-sistema {
+  padding: 20px 0;
+}
+
+.totales-sistema h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px 0;
+  font-size: 1.125rem;
+  color: #1976d2;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+.total-row .label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.total-row .value {
+  font-size: 0.875rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.total-principal {
+  background: #e3f2fd;
+  font-size: 1rem;
+  margin-bottom: 12px;
+}
+
+.total-principal .label,
+.total-principal .value {
+  font-size: 1.125rem;
+  color: #1976d2;
+  font-weight: 700;
+}
+
+.desglose {
+  margin-left: 16px;
+  border-left: 3px solid #e0e0e0;
+  padding-left: 12px;
+}
+
+.subtotal {
+  background: #fff3e0;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.subtotal .label,
+.subtotal .value {
+  color: #f57c00;
+}
+
+.pendiente {
+  background: #fff3e0;
+  margin-top: 12px;
+  border-left: 3px solid #ff9800;
+}
+
+.pendiente .label,
+.pendiente .value {
+  color: #f57c00;
+  font-weight: 600;
+}
+
+.small-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #999;
+}
+
+/* ========== ERROR MESSAGE ========== */
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #ffebee;
+  color: #c62828;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.error-message mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* ========== FORM ========== */
+.form-cierre {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 20px;
+}
+
+.form-cierre h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px 0;
+  font-size: 1.125rem;
+  color: #d32f2f;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* ========== DIFERENCIA BOX ========== */
+.diferencia-box {
+  padding: 16px;
+  border-radius: 8px;
+  border: 2px solid;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.diferencia-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.diferencia-header mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.diferencia-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.diferencia-valor {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.diferencia-valor .monto {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.diferencia-valor .tipo {
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Diferencia Positiva (Sobrante) */
+.diferencia-positiva {
+  background: #fff3e0;
+  border-color: #ff9800;
+}
+
+.diferencia-positiva .diferencia-header mat-icon,
+.diferencia-positiva .diferencia-label {
+  color: #f57c00;
+}
+
+.diferencia-positiva .monto {
+  color: #f57c00;
+}
+
+.diferencia-positiva .tipo {
+  background: #ff9800;
+  color: white;
+}
+
+/* Diferencia Negativa (Faltante) */
+.diferencia-negativa {
+  background: #ffebee;
+  border-color: #f44336;
+}
+
+.diferencia-negativa .diferencia-header mat-icon,
+.diferencia-negativa .diferencia-label {
+  color: #d32f2f;
+}
+
+.diferencia-negativa .monto {
+  color: #d32f2f;
+}
+
+.diferencia-negativa .tipo {
+  background: #f44336;
+  color: white;
+}
+
+/* Diferencia Neutra (Cuadrado) */
+.diferencia-neutra {
+  background: #e8f5e9;
+  border-color: #4caf50;
+}
+
+.diferencia-neutra .diferencia-header mat-icon,
+.diferencia-neutra .diferencia-label {
+  color: #2e7d32;
+}
+
+.diferencia-neutra .monto {
+  color: #2e7d32;
+}
+
+.diferencia-neutra .tipo {
+  background: #4caf50;
+  color: white;
+}
+
+/* ========== DIVIDER ========== */
+mat-divider {
+  margin: 20px 0;
+}
+
+/* ========== ACTIONS ========== */
+.modal-actions {
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.button-spinner {
+  display: inline-block;
+  margin-right: 8px;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 600px) {
+  .modal-container {
+    max-width: 100%;
+  }
+
+  .modal-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .modal-content {
+    padding: 16px;
+  }
+
+  .diferencia-valor .monto {
+    font-size: 1.5rem;
+  }
+
+  .diferencia-valor .tipo {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+  }
+}

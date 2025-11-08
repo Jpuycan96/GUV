@@ -1,0 +1,785 @@
+<div class="orden-form-container">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>
+        <mat-icon class="title-icon">add_circle</mat-icon>
+        Nueva Orden de Trabajo
+      </h1>
+      <p class="subtitle">Crea una nueva orden o cotización</p>
+    </div>
+    
+    <div class="header-actions">
+      <button mat-stroked-button (click)="cancelar()">
+        <mat-icon>close</mat-icon>
+        Cancelar
+      </button>
+    </div>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="error" class="alert alert-error">
+    <mat-icon>error</mat-icon>
+    <span>{{ error }}</span>
+  </div>
+
+  <!-- Loading inicial -->
+  <div *ngIf="cargando" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando datos necesarios...</p>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- ✅ ASISTENTE INTELIGENTE CON IA - COLAPSABLE -->
+  <!-- ============================================ -->
+  <mat-expansion-panel class="asistente-ia-card" *ngIf="!cargando">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        <div class="ia-header-content">
+          <mat-icon class="ia-icon">psychology</mat-icon>
+          <div class="ia-header-text">
+            <h3>
+              🤖 Asistente Inteligente 
+              <span class="badge-ayuda">AYUDA</span>
+            </h3>
+            <p>Describe tu pedido y la IA completará el formulario automáticamente</p>
+          </div>
+        </div>
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <!-- Contenido colapsable -->
+    <ng-template matExpansionPanelContent>
+      <!-- Campo de texto libre -->
+      <mat-form-field appearance="outline" class="full-width ia-textarea">
+        <mat-label>Describe tu pedido</mat-label>
+        <textarea matInput 
+                  [(ngModel)]="textoLibreIA"
+                  [ngModelOptions]="{standalone: true}"
+                  rows="3"
+                  placeholder='Ejemplo: "2 banner grueso de 2 * 1 en UV para el sábado a las 18:30"'
+                  [disabled]="interpretandoIA">
+        </textarea>
+        <mat-icon matPrefix>chat</mat-icon>
+        <mat-hint>
+          Puedes mencionar: cantidad, material, dimensiones, fecha de entrega, extras, etc.
+        </mat-hint>
+      </mat-form-field>
+
+      <!-- Mensaje de error IA -->
+      <div *ngIf="errorIA" class="ia-alert">
+        <mat-icon>warning</mat-icon>
+        <span>{{ errorIA }}</span>
+      </div>
+
+      <!-- Resultado exitoso -->
+      <div *ngIf="resultadoIA && !errorIA" class="ia-resultado-exitoso">
+        <mat-icon class="success-icon">check_circle</mat-icon>
+        <div class="resultado-info">
+          <strong>✅ Interpretación completada</strong>
+          <span class="confianza">
+            Confianza: {{ (confianzaIA * 100).toFixed(0) }}%
+          </span>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="ia-actions">
+        <button mat-raised-button 
+                color="primary"
+                (click)="interpretarConIA()"
+                [disabled]="!textoLibreIA.trim() || interpretandoIA"
+                type="button">
+          <mat-icon>{{interpretandoIA ? 'hourglass_empty' : 'psychology'}}</mat-icon>
+          <span *ngIf="!interpretandoIA">Interpretar con IA</span>
+          <span *ngIf="interpretandoIA">Interpretando...</span>
+        </button>
+
+        <button mat-stroked-button 
+                (click)="limpiarAsistenteIA()"
+                [disabled]="interpretandoIA"
+                type="button"
+                *ngIf="textoLibreIA || resultadoIA">
+          <mat-icon>clear</mat-icon>
+          Limpiar
+        </button>
+      </div>
+
+      <!-- Loading spinner -->
+      <div *ngIf="interpretandoIA" class="ia-loading">
+        <mat-spinner diameter="24"></mat-spinner>
+        <p>Analizando tu pedido...</p>
+      </div>
+    </ng-template>
+  </mat-expansion-panel>
+  <!-- ============================================ -->
+  <!-- FIN ASISTENTE IA -->
+  <!-- ============================================ -->
+
+  <!-- Formulario principal -->
+  <form [formGroup]="ordenForm" *ngIf="!cargando">
+
+    <!-- Stepper -->
+    <mat-stepper linear #stepper>
+      
+      <!-- PASO 1: Datos Básicos -->
+      <mat-step [stepControl]="ordenForm" label="Datos Básicos">
+        <mat-card class="step-card">
+          <h2>Información General</h2>
+          
+          <!-- ✅ BÚSQUEDA DE CLIENTE POR CELULAR -->
+          <div class="busqueda-cliente-section">
+            <h3>
+              <mat-icon>search</mat-icon>
+              Buscar Cliente por Celular
+            </h3>
+            
+            <div class="busqueda-cliente-form">
+              <mat-form-field appearance="outline" class="busqueda-input">
+                <mat-label>Número de Celular</mat-label>
+                <input matInput 
+                       [(ngModel)]="busquedaCelular"
+                       [ngModelOptions]="{standalone: true}"
+                       placeholder="999888777"
+                       type="tel">
+                <mat-icon matPrefix>phone</mat-icon>
+              </mat-form-field>
+
+              <button mat-raised-button 
+                      color="primary" 
+                      (click)="buscarClientePorCelular()"
+                      type="button">
+                <mat-icon>search</mat-icon>
+                Buscar
+              </button>
+
+              <button mat-stroked-button 
+                      *ngIf="clienteEncontrado"
+                      (click)="limpiarBusquedaCliente()"
+                      type="button">
+                <mat-icon>clear</mat-icon>
+                Limpiar
+              </button>
+            </div>
+
+            <!-- Cliente encontrado -->
+            <div class="cliente-encontrado" *ngIf="clienteEncontrado">
+              <mat-icon class="success-icon">check_circle</mat-icon>
+              <div class="cliente-info">
+                <strong>{{ clienteEncontrado.nombre }}</strong>
+                <span>{{ clienteEncontrado.telefono }}</span>
+                <span *ngIf="clienteEncontrado.email">{{ clienteEncontrado.email }}</span>
+              </div>
+            </div>
+
+            <!-- ✅ BOTÓN REGISTRAR CLIENTE -->
+            <div class="registrar-cliente" *ngIf="mostrarFormCliente && !clienteEncontrado">
+              <p class="mensaje-no-encontrado">
+                <mat-icon>info</mat-icon>
+                No se encontró el cliente. ¿Deseas registrarlo?
+              </p>
+              <a mat-raised-button 
+                color="accent"
+                routerLink="/clientes/nuevo"
+                [queryParams]="{telefono: busquedaCelular, returnUrl: '/ordenes/crear'}">
+                <mat-icon>person_add</mat-icon>
+                Registrar Nuevo Cliente
+               </a>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div class="form-grid">
+            
+            <!-- Cliente (selección manual o búsqueda) -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Cliente *</mat-label>
+              <mat-select formControlName="idCliente">
+                <mat-option *ngFor="let cliente of clientes" [value]="cliente.idCliente">
+                  {{ cliente.nombre }} - {{ cliente.telefono }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="ordenForm.get('idCliente')?.hasError('required')">
+                El cliente es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <!-- ✅ VENDEDOR (Usuario actual) -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Vendedor *</mat-label>
+              <mat-select formControlName="idVendedor">
+                <mat-option *ngFor="let vendedor of vendedores" [value]="vendedor.id">
+                  {{ vendedor.nombre }}
+                  <span *ngIf="vendedor.username === usuarioActual?.username" class="badge-actual">
+                    (Tú)
+                  </span>
+                </mat-option>
+              </mat-select>
+              <mat-hint *ngIf="usuarioActual">
+                Usuario actual: {{ usuarioActual.username }}
+              </mat-hint>
+              <mat-error *ngIf="ordenForm.get('idVendedor')?.hasError('required')">
+                El vendedor es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Fecha y Hora de Entrega -->
+            <div class="fecha-hora-group full-width">
+            <mat-form-field appearance="outline" class="fecha-field">
+                <mat-label>Fecha de Entrega</mat-label>
+                <input matInput 
+                    [matDatepicker]="picker"
+                    [(ngModel)]="fechaEntrega"
+                    [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="actualizarFechaEntrega()"
+                    placeholder="Selecciona fecha">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="hora-field">
+                <mat-label>Hora de Entrega</mat-label>
+                <input matInput 
+                    type="time"
+                    [(ngModel)]="horaEntrega"
+                    [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="actualizarFechaEntrega()"
+                    placeholder="00:00">
+                <mat-icon matPrefix>schedule</mat-icon>
+            </mat-form-field>
+            </div>
+            <!-- Observaciones -->
+            <mat-form-field appearance="outline" class="full-width-2">
+              <mat-label>Observaciones</mat-label>
+              <textarea matInput 
+                        formControlName="observaciones"
+                        rows="3"
+                        placeholder="Instrucciones especiales, detalles adicionales...">
+              </textarea>
+            </mat-form-field>
+
+          </div>
+
+          <div class="step-actions">
+            <button mat-raised-button color="primary" matStepperNext type="button">
+              Siguiente
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </mat-card>
+      </mat-step>
+
+      <!-- PASO 2: Servicios -->
+      <mat-step label="Servicios">
+        <mat-card class="step-card">
+          <div class="section-header">
+            <h2>Servicios de la Orden</h2>
+            <button mat-raised-button color="accent" (click)="agregarServicio()" type="button">
+              <mat-icon>add</mat-icon>
+              Agregar Servicio
+            </button>
+          </div>
+
+          <!-- Mensaje si no hay servicios -->
+          <div *ngIf="serviciosAgregados.length === 0" class="empty-message">
+            <mat-icon>info</mat-icon>
+            <p>No has agregado ningún servicio. Haz clic en "Agregar Servicio" para comenzar.</p>
+          </div>
+
+          <!-- Lista de servicios agregados -->
+          <div class="servicios-list">
+            <mat-expansion-panel *ngFor="let servicio of serviciosAgregados; let i = index" 
+                                 class="servicio-panel"
+                                 [expanded]="true">
+              
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <mat-icon class="panel-icon">shopping_cart</mat-icon>
+                  <span>Servicio #{{ i + 1 }}</span>
+                  <mat-chip *ngIf="servicio.nombreServicio" class="chip-info">
+                    {{ servicio.nombreServicio }}
+                  </mat-chip>
+                </mat-panel-title>
+                <mat-panel-description>
+                  <span class="servicio-subtotal">S/ {{ servicio.subtotal | number:'1.2-2' }}</span>
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+
+              <!-- Contenido del servicio -->
+              <div class="servicio-content">
+                
+                <div class="form-grid">
+                  
+                  <!-- Servicio -->
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Servicio *</mat-label>
+                    <mat-select [(ngModel)]="servicio.idServicio" 
+                                [ngModelOptions]="{standalone: true}"
+                                (selectionChange)="onServicioChange(i)">
+                      <mat-option *ngFor="let s of servicios" [value]="s.idServicio">
+                        {{ s.nombre }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <!-- ✅ MATERIAL (solo los del servicio seleccionado) -->
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Material *</mat-label>
+                    <mat-select [(ngModel)]="servicio.idMaterial" 
+                                [ngModelOptions]="{standalone: true}"
+                                (selectionChange)="onMaterialChange(i)"
+                                [disabled]="!servicio.idServicio">
+                      <mat-option *ngFor="let m of materialesFiltrados" [value]="m.idMaterial">
+                        {{ m.nombre }}
+                      </mat-option>
+                    </mat-select>
+                    <mat-hint *ngIf="!servicio.idServicio">
+                      Primero selecciona un servicio
+                    </mat-hint>
+                    <mat-hint *ngIf="servicio.idServicio && materialesFiltrados.length === 0">
+                      No hay materiales disponibles para este servicio
+                    </mat-hint>
+                  </mat-form-field>
+
+                  <!-- ✅ MODELO (con descripción, solo los del material) -->
+                  <mat-form-field appearance="outline" class="full-width-2">
+                    <mat-label>Modelo (opcional)</mat-label>
+                    <mat-select [(ngModel)]="servicio.idModelo" 
+                                [ngModelOptions]="{standalone: true}"
+                                (selectionChange)="onModeloChange(i)"
+                                [disabled]="!servicio.idMaterial">
+                      <mat-option [value]="null">Sin modelo</mat-option>
+                      <mat-option *ngFor="let m of modelosFiltrados" [value]="m.idModelo">
+                        <div class="modelo-option">
+                          <strong>{{ m.codigo }}</strong>
+                          <span class="modelo-desc">{{ m.descripcion }}</span>
+                        </div>
+                      </mat-option>
+                    </mat-select>
+                    <mat-hint *ngIf="!servicio.idMaterial">
+                      Primero selecciona un material
+                    </mat-hint>
+                  </mat-form-field>
+
+                  <!-- Cantidad -->
+                  <mat-form-field appearance="outline">
+                    <mat-label>Cantidad *</mat-label>
+                    <input matInput 
+                           type="number" 
+                           [(ngModel)]="servicio.cantidad"
+                           [ngModelOptions]="{standalone: true}"
+                           (ngModelChange)="onCantidadChange(i)"
+                           min="1"
+                           step="1">
+                  </mat-form-field>
+
+                  <!-- ✅ DIMENSIONES (solo si el servicio lo requiere) -->
+                  <ng-container *ngIf="servicio.requiereDimensiones">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Ancho (m) *</mat-label>
+                      <input matInput 
+                             type="number" 
+                             [(ngModel)]="servicio.ancho"
+                             [ngModelOptions]="{standalone: true}"
+                             (ngModelChange)="onDimensionesChange(i)"
+                             min="0"
+                             step="0.01"
+                             placeholder="0.00">
+                      <mat-icon matSuffix>straighten</mat-icon>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                      <mat-label>Alto (m) *</mat-label>
+                      <input matInput 
+                             type="number" 
+                             [(ngModel)]="servicio.alto"
+                             [ngModelOptions]="{standalone: true}"
+                             (ngModelChange)="onDimensionesChange(i)"
+                             min="0"
+                             step="0.01"
+                             placeholder="0.00">
+                      <mat-icon matSuffix>straighten</mat-icon>
+                    </mat-form-field>
+                  </ng-container>
+
+                  <!-- ✅ DISEÑO (Checkboxes + campo archivo) -->
+                  <div class="diseno-section full-width-2">
+                    <label class="section-label">Diseño</label>
+                    
+                    <div class="diseno-checkboxes">
+                      <mat-checkbox [(ngModel)]="servicio.sinDiseno"
+                                    [ngModelOptions]="{standalone: true}"
+                                    (change)="onDisenoChange(i, 'sin')">
+                        Sin Diseño
+                      </mat-checkbox>
+
+                      <mat-checkbox [(ngModel)]="servicio.disenoEmpresa"
+                                    [ngModelOptions]="{standalone: true}"
+                                    (change)="onDisenoChange(i, 'empresa')">
+                        Diseño por la Empresa
+                      </mat-checkbox>
+
+                      <mat-checkbox [(ngModel)]="servicio.disenoCliente"
+                                    [ngModelOptions]="{standalone: true}"
+                                    (change)="onDisenoChange(i, 'cliente')">
+                        Diseño del Cliente
+                      </mat-checkbox>
+                    </div>
+
+                    <!-- Campo para subir archivo de diseño -->
+                    <mat-form-field appearance="outline" 
+                                    class="archivo-diseno"
+                                    *ngIf="!servicio.sinDiseno">
+                      <mat-label>Archivo de Diseño (Ruta o URL)</mat-label>
+                      <input matInput 
+                             [(ngModel)]="servicio.archivoDiseno"
+                             [ngModelOptions]="{standalone: true}"
+                             placeholder="https://drive.google.com/... o /ruta/archivo.psd">
+                      <mat-icon matPrefix>insert_drive_file</mat-icon>
+                      <mat-hint>Puedes agregarlo ahora o después</mat-hint>
+                    </mat-form-field>
+                  </div>
+
+                  <!-- Descripción -->
+                  <mat-form-field appearance="outline" class="full-width-2">
+                    <mat-label>Descripción / Detalles</mat-label>
+                    <textarea matInput 
+                              [(ngModel)]="servicio.descripcion"
+                              [ngModelOptions]="{standalone: true}"
+                              rows="2"
+                              placeholder="Detalles específicos del servicio...">
+                    </textarea>
+                  </mat-form-field>
+
+                </div>
+
+                <!-- Precio calculado -->
+                <div class="precio-info">
+                  <div class="precio-item">
+                    <span class="label">Precio Unitario:</span>
+                    <span class="value">S/ {{ servicio.precioUnitario | number:'1.2-2' }}</span>
+                  </div>
+                  <div class="precio-item">
+                    <span class="label">Unidad:</span>
+                    <span class="value">{{ servicio.unidadMedida }}</span>
+                  </div>
+                  <div class="precio-item">
+                    <span class="label">Área:</span>
+                    <span class="value" *ngIf="servicio.ancho && servicio.alto">
+                      {{ servicio.ancho * servicio.alto | number:'1.2-2' }} m²
+                    </span>
+                    <span class="value" *ngIf="!servicio.ancho || !servicio.alto">
+                      N/A
+                    </span>
+                  </div>
+                  <div class="precio-item subtotal">
+                    <span class="label">Subtotal Servicio:</span>
+                    <span class="value">S/ {{ servicio.subtotal | number:'1.2-2' }}</span>
+                  </div>
+                </div>
+
+                <mat-divider></mat-divider>
+
+                <!-- ✅ EXTRAS DEL SERVICIO (con precios correctos) -->
+                <div class="extras-section">
+                  <div class="section-header-small">
+                    <h3>Extras del Servicio</h3>
+                    <button mat-stroked-button (click)="agregarExtra(i)" type="button">
+                      <mat-icon>add</mat-icon>
+                      Agregar Extra
+                    </button>
+                  </div>
+
+                  <!-- Lista de extras -->
+                  <div class="extras-list" *ngIf="servicio.extras.length > 0">
+                    <div class="extra-item" *ngFor="let extra of servicio.extras; let j = index">
+                      
+                      <div class="extra-grid">
+                        
+                        <!-- Extra -->
+                        <mat-form-field appearance="outline">
+                          <mat-label>Extra *</mat-label>
+                          <mat-select [(ngModel)]="extra.idExtra" 
+                                      [ngModelOptions]="{standalone: true}"
+                                      (selectionChange)="onExtraChange(i, j)">
+                            <mat-option *ngFor="let e of extras" [value]="e.idExtra">
+                              {{ e.nombre }}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+
+                        <!-- Detalle del extra -->
+                        <mat-form-field appearance="outline" 
+                                        *ngIf="extra.idExtra && extrasDetalles.has(extra.idExtra)">
+                          <mat-label>Detalle / Opción</mat-label>
+                          <mat-select [(ngModel)]="extra.idExtraDetalle" 
+                                      [ngModelOptions]="{standalone: true}"
+                                      (selectionChange)="onExtraDetalleChange(i, j)">
+                            <mat-option *ngFor="let det of extrasDetalles.get(extra.idExtra)" 
+                                        [value]="det.idExtraDetalle">
+                              {{ det.unidadBaseExtra }} 
+                              <span class="precio-extra">
+                                - S/ {{ det.precioExtraBase | number:'1.2-2' }}
+                              </span>
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+
+                        <!-- Cantidad -->
+                        <mat-form-field appearance="outline">
+                          <mat-label>Cantidad</mat-label>
+                          <input matInput 
+                                 type="number" 
+                                 [(ngModel)]="extra.cantidad"
+                                 [ngModelOptions]="{standalone: true}"
+                                 (ngModelChange)="onExtraCantidadChange(i, j)"
+                                 min="1"
+                                 step="1">
+                        </mat-form-field>
+
+                        <!-- Precio unitario del extra -->
+                        <div class="extra-precio-info">
+                          <span class="label-small">Precio:</span>
+                          <span class="precio-value">S/ {{ extra.precio | number:'1.2-2' }}</span>
+                        </div>
+
+                        <!-- Subtotal extra -->
+                        <div class="extra-subtotal">
+                          <span class="label-small">Subtotal:</span>
+                          <span class="subtotal-value">S/ {{ extra.subtotal | number:'1.2-2' }}</span>
+                        </div>
+
+                        <!-- Botón eliminar -->
+                        <button mat-icon-button 
+                                color="warn" 
+                                (click)="eliminarExtra(i, j)"
+                                type="button"
+                                matTooltip="Eliminar extra">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+
+                      </div>
+
+                    </div>
+                  </div>
+
+                  <p class="empty-extras" *ngIf="servicio.extras.length === 0">
+                    Sin extras agregados
+                  </p>
+
+                  <!-- Total de extras del servicio -->
+                  <div class="total-extras-servicio" *ngIf="servicio.extras.length > 0">
+                    <span class="label">Total Extras:</span>
+                    <span class="value">
+                      S/ {{ calcularTotalExtrasServicio(servicio) | number:'1.2-2' }}
+                    </span>
+                  </div>
+
+                </div>
+
+                <!-- Botón eliminar servicio -->
+                <div class="servicio-actions">
+                  <button mat-stroked-button 
+                          color="warn" 
+                          (click)="eliminarServicio(i)"
+                          type="button">
+                    <mat-icon>delete</mat-icon>
+                    Eliminar Servicio
+                  </button>
+                </div>
+
+              </div>
+
+            </mat-expansion-panel>
+          </div>
+
+          <!-- Navegación del stepper -->
+          <div class="step-actions">
+            <button mat-button matStepperPrevious type="button">
+              <mat-icon>arrow_back</mat-icon>
+              Anterior
+            </button>
+            <button mat-raised-button 
+                    color="primary" 
+                    matStepperNext 
+                    type="button"
+                    [disabled]="serviciosAgregados.length === 0">
+              Siguiente
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+
+        </mat-card>
+      </mat-step>
+
+      <!-- PASO 3: Resumen y Descuento -->
+      <mat-step label="Resumen">
+        <mat-card class="step-card">
+          <h2>Resumen de la Orden</h2>
+
+          <!-- Resumen de servicios -->
+          <div class="resumen-servicios">
+            <h3>Servicios ({{ serviciosAgregados.length }})</h3>
+            <div class="servicio-resumen" *ngFor="let servicio of serviciosAgregados; let i = index">
+              <div class="servicio-resumen-header">
+                <span class="numero">#{{ i + 1 }}</span>
+                <div class="servicio-resumen-info">
+                  <span class="nombre">{{ servicio.nombreServicio }}</span>
+                  <span class="material">Material: {{ servicio.nombreMaterial }}</span>
+                  <span class="cantidad">Cantidad: x{{ servicio.cantidad }}</span>
+                  <span class="dimensiones" *ngIf="servicio.ancho && servicio.alto">
+                    Dimensiones: {{ servicio.ancho }}m x {{ servicio.alto }}m 
+                    ({{ servicio.ancho * servicio.alto | number:'1.2-2' }} m²)
+                  </span>
+                </div>
+                <span class="precio">S/ {{ servicio.subtotal | number:'1.2-2' }}</span>
+              </div>
+              
+              <!-- ✅ MOSTRAR EXTRAS EN EL RESUMEN -->
+              <div class="servicio-resumen-extras" *ngIf="servicio.extras.length > 0">
+                <div class="extra-resumen" *ngFor="let extra of servicio.extras">
+                  <mat-icon class="extra-icon">add_circle</mat-icon>
+                  <span class="extra-nombre">{{ extra.nombreExtra }}</span>
+                  <span class="extra-detalle" *ngIf="extra.nombreDetalle">
+                    ({{ extra.nombreDetalle }})
+                  </span>
+                  <span class="extra-cantidad">x{{ extra.cantidad }}</span>
+                  <span class="extra-precio">S/ {{ extra.subtotal | number:'1.2-2' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <!-- Totales -->
+          <div class="totales-section">
+            <div class="total-item">
+              <span class="label">Subtotal Servicios:</span>
+              <span class="value">S/ {{ subtotal | number:'1.2-2' }}</span>
+            </div>
+            <div class="total-item" *ngIf="totalExtras > 0">
+              <span class="label">Total Extras:</span>
+              <span class="value">S/ {{ totalExtras | number:'1.2-2' }}</span>
+            </div>
+            <div class="total-item">
+              <span class="label">Subtotal Bruto:</span>
+              <span class="value">S/ {{ subtotalBruto | number:'1.2-2' }}</span>
+            </div>
+
+            <!-- Descuento -->
+            <mat-divider></mat-divider>
+
+            <div class="descuento-section">
+              <button mat-stroked-button 
+                      color="accent"
+                      (click)="abrirDescuento()"
+                      type="button"
+                      *ngIf="!aplicarDescuento">
+                <mat-icon>local_offer</mat-icon>
+                Aplicar Descuento
+              </button>
+
+              <div class="descuento-form-active" *ngIf="aplicarDescuento">
+                <h4>
+                  <mat-icon>local_offer</mat-icon>
+                  Descuento Aplicado
+                </h4>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Motivo del Descuento *</mat-label>
+                  <input matInput formControlName="motivoDescuento">
+                  <mat-error>El motivo es requerido al aplicar descuento</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="monto-descuento">
+                  <mat-label>Monto de Descuento (S/)</mat-label>
+                  <input matInput 
+                         type="number" 
+                         [(ngModel)]="montoDescuento"
+                         [ngModelOptions]="{standalone: true}"
+                         (ngModelChange)="onMontoDescuentoChange()"
+                         min="0"
+                         [max]="subtotalBruto * 0.10"
+                         step="0.01"
+                         placeholder="0.00">
+                  <span matPrefix>S/ &nbsp;</span>
+                  <mat-hint>
+                    Máximo: S/ {{ (subtotalBruto * 0.10) | number:'1.2-2' }} (10%)
+                  </mat-hint>
+                  <mat-error *ngIf="errorDescuento">{{ errorDescuento }}</mat-error>
+                </mat-form-field>
+
+                <div class="descuento-info">
+                  <div class="info-item">
+                    <span>Porcentaje:</span>
+                    <strong>{{ porcentajeDescuento | number:'1.2-2' }}%</strong>
+                  </div>
+                  <div class="info-item">
+                    <span>Descuento:</span>
+                    <strong class="descuento-value">- S/ {{ descuento | number:'1.2-2' }}</strong>
+                  </div>
+                </div>
+
+                <button mat-button 
+                        color="warn"
+                        (click)="cancelarDescuento()"
+                        type="button">
+                  <mat-icon>close</mat-icon>
+                  Cancelar Descuento
+                </button>
+              </div>
+            </div>
+
+            <mat-divider *ngIf="aplicarDescuento"></mat-divider>
+
+            <!-- Total Final -->
+            <div class="total-item total-final">
+              <span class="label">TOTAL FINAL:</span>
+              <span class="value">S/ {{ totalFinal | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <!-- Navegación y guardar -->
+          <div class="step-actions">
+            <button mat-button matStepperPrevious type="button">
+              <mat-icon>arrow_back</mat-icon>
+              Anterior
+            </button>
+            
+            <div class="save-buttons">
+              <button mat-raised-button 
+                      (click)="guardarOrden(true)"
+                      type="button"
+                      [disabled]="guardando">
+                <mat-icon>receipt</mat-icon>
+                Guardar como Cotización
+              </button>
+              
+              <button mat-raised-button 
+                      color="primary"
+                      (click)="guardarOrden(false)"
+                      type="button"
+                      [disabled]="guardando">
+                <mat-icon>check_circle</mat-icon>
+                Guardar como Orden
+              </button>
+            </div>
+          </div>
+
+          <!-- Loading al guardar -->
+          <div *ngIf="guardando" class="saving-overlay">
+            <mat-spinner diameter="40"></mat-spinner>
+            <p>Guardando orden...</p>
+          </div>
+
+        </mat-card>
+      </mat-step>
+
+    </mat-stepper>
+
+  </form>
+
+</div>

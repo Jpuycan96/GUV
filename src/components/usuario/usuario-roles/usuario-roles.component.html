@@ -1,0 +1,79 @@
+<div class="roles-container">
+  
+  <!-- Header -->
+  <div class="roles-header">
+    <h1>
+      <mat-icon>admin_panel_settings</mat-icon>
+      Gestionar Roles
+    </h1>
+    <p class="subtitle" *ngIf="usuario">Usuario: <strong>{{ usuario.nombre }}</strong></p>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="cargando" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Cargando roles...</p>
+  </div>
+
+  <!-- Contenido -->
+  <mat-card *ngIf="!cargando" class="roles-card">
+    
+    <!-- Error alert -->
+    <div *ngIf="error" class="alert alert-error">
+      <mat-icon>error</mat-icon>
+      <span>{{ error }}</span>
+    </div>
+
+    <div class="roles-info">
+      <mat-icon>info</mat-icon>
+      <p>Selecciona los roles que tendrá este usuario en el sistema</p>
+    </div>
+
+    <div class="roles-grid">
+      <mat-card 
+        *ngFor="let rol of rolesDisponibles" 
+        class="role-card"
+        [class.selected]="isRolSeleccionado(rol.nombre)"
+        (click)="toggleRol(rol.nombre)">
+        
+        <mat-checkbox 
+          [checked]="isRolSeleccionado(rol.nombre)"
+          (change)="toggleRol(rol.nombre)"
+          (click)="$event.stopPropagation()">
+        </mat-checkbox>
+
+        <div class="role-info">
+          <h3>{{ getRolLabel(rol) }}</h3>
+          <p>{{ getRolDescription(rol) }}</p>
+        </div>
+      </mat-card>
+    </div>
+
+    <div *ngIf="rolesSeleccionados.size === 0" class="no-roles-warning">
+      <mat-icon>warning</mat-icon>
+      <span>El usuario no tiene ningún rol asignado. No podrá acceder al sistema.</span>
+    </div>
+
+    <!-- Acciones -->
+    <div class="roles-actions">
+      <button mat-button 
+              type="button" 
+              (click)="cancelar()"
+              [disabled]="guardando">
+        <mat-icon>close</mat-icon>
+        Cancelar
+      </button>
+
+      <button mat-raised-button 
+              color="primary" 
+              (click)="guardar()"
+              [disabled]="guardando">
+        <mat-spinner *ngIf="guardando" diameter="20"></mat-spinner>
+        <mat-icon *ngIf="!guardando">save</mat-icon>
+        {{ guardando ? 'Guardando...' : 'Guardar Cambios' }}
+      </button>
+    </div>
+
+  </mat-card>
+
+</div>

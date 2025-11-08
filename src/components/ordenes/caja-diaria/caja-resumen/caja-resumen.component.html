@@ -1,0 +1,417 @@
+<div class="resumen-container">
+
+  <!-- ========== LOADING ========== -->
+  <div *ngIf="cargando" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando resumen de caja...</p>
+  </div>
+
+  <!-- ========== ERROR ========== -->
+  <div *ngIf="error && !cargando" class="alert">
+    <mat-icon>error</mat-icon>
+    <span>{{ error }}</span>
+    <button mat-button (click)="volver()">Volver</button>
+  </div>
+
+  <!-- ========== CONTENIDO ========== -->
+  <div *ngIf="caja && !cargando">
+    
+    <!-- ========== HEADER ========== -->
+    <div class="page-header">
+      <div class="header-left">
+        <button mat-icon-button (click)="volver()" matTooltip="Volver">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div class="header-content">
+          <h1>
+            <mat-icon>account_balance_wallet</mat-icon>
+            Resumen de Caja
+          </h1>
+          <p class="subtitle">
+            {{ caja.nombreCajero }} • {{ caja.fecha | date:'dd/MM/yyyy' }}
+          </p>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <button mat-icon-button (click)="recalcular()" matTooltip="Recalcular totales">
+          <mat-icon>calculate</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- ========== BANNER CAJA ABIERTA (MÁS VISIBLE) ========== -->
+    <div class="caja-banner">
+      <div class="banner-content">
+        <div class="banner-info">
+          <h2>
+            <mat-icon>schedule</mat-icon>
+            Caja Abierta: {{ caja.nombreTurno || 'Turno' }}
+          </h2>
+          <p>
+            Cajero: {{ caja.nombreCajero || 'N/A' }} • 
+            Desde: {{ caja.fApertura | date:'HH:mm' }}
+            <span *ngIf="caja.estado === 'CERRADA'"> • 
+              Hasta: {{ caja.fCierre | date:'HH:mm' }}
+            </span>
+          </p>
+        </div>
+        
+        <div class="banner-actions">
+          <button mat-raised-button (click)="recargar()">
+            <mat-icon>refresh</mat-icon>
+            Actualizar
+          </button>
+          <button mat-raised-button (click)="imprimir()">
+            <mat-icon>print</mat-icon>
+            Imprimir
+          </button>
+        </div>
+      </div>
+    </div>
+
+      <!-- ========== RESUMEN PRINCIPAL ========== -->
+      <div class="stats-row">
+        <!-- Órdenes del Turno -->
+        <mat-card class="stat-card">
+          <mat-icon class="stat-icon ordenes">shopping_cart</mat-icon>
+          <div class="stat-content">
+            <div class="stat-value">{{ ordenesTurno.length }}</div>
+            <div class="stat-label">Órdenes del Turno</div>
+          </div>
+        </mat-card>
+
+        <!-- Venta Neta -->
+        <mat-card class="stat-card">
+          <mat-icon class="stat-icon ventas">trending_up</mat-icon>
+          <div class="stat-content">
+            <div class="stat-value">S/ {{ caja.ventaNeta | number:'1.2-2' }}</div>
+            <div class="stat-label">Venta Neta</div>
+          </div>
+        </mat-card>
+
+        <!-- Total Cobrado -->
+        <mat-card class="stat-card">
+          <mat-icon class="stat-icon cobrado">payments</mat-icon>
+          <div class="stat-content">
+            <div class="stat-value">S/ {{ getTotalCobrado() | number:'1.2-2' }}</div>
+            <div class="stat-label">Total Cobrado</div>
+          </div>
+        </mat-card>
+
+        <!-- ✅ NUEVO: Pago en Efectivo -->
+        <mat-card class="stat-card">
+          <mat-icon class="stat-icon efectivo">account_balance_wallet</mat-icon>
+          <div class="stat-content">
+            <div class="stat-value">S/ {{ caja.totalEfectivo | number:'1.2-2' }}</div>
+            <div class="stat-label">Pago en Efectivo</div>
+          </div>
+        </mat-card>
+
+        <!-- ✅ CAMBIADO: "Otros Pagos" → "Pagos Digitales" -->
+        <mat-card class="stat-card">
+          <mat-icon class="stat-icon otros-pagos">smartphone</mat-icon>
+          <div class="stat-content">
+            <div class="stat-value">S/ {{ getTotalDigital() | number:'1.2-2' }}</div>
+            <div class="stat-label">Pagos Digitales</div>
+          </div>
+        </mat-card>
+
+        <!-- Saldo Pendiente -->
+        <mat-card class="stat-card">
+          <mat-icon class="stat-icon pendiente">schedule</mat-icon>
+          <div class="stat-content">
+            <div class="stat-value">S/ {{ caja.totalPendiente | number:'1.2-2' }}</div>
+            <div class="stat-label">Saldo Pendiente</div>
+          </div>
+        </mat-card>
+      </div>
+
+    <!-- ========== ÓRDENES DEL TURNO (PRIMERO) ========== -->
+    <mat-card class="ordenes-card">
+      <mat-tab-group>
+        
+        <!-- TAB 1: Órdenes del Turno -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>receipt_long</mat-icon>
+            Órdenes del Turno ({{ ordenesTurno.length }})
+          </ng-template>
+
+          <div class="tab-content">
+            <!-- Loading -->
+            <div *ngIf="cargandoOrdenes" class="loading-container">
+              <mat-spinner diameter="40"></mat-spinner>
+              <p>Cargando órdenes...</p>
+            </div>
+
+            <!-- Empty -->
+            <div *ngIf="!cargandoOrdenes && ordenesTurno.length === 0" class="empty-message">
+              <mat-icon>inbox</mat-icon>
+              <p>No hay órdenes registradas en este turno</p>
+            </div>
+
+            <!-- Lista de órdenes -->
+            <div class="ordenes-list" *ngIf="!cargandoOrdenes && ordenesTurno.length > 0">
+              <div class="orden-item" 
+                   *ngFor="let orden of ordenesTurno"
+                   (click)="verOrden(orden.idOrden)">
+                
+                <div class="orden-header">
+                  <div class="orden-numero">
+                    <strong>{{ orden.numeroOrden }}</strong>
+                  </div>
+                  
+                  <div class="estado-pago" [class]="getEstadoPagoClass(orden)">
+                    <mat-icon>{{ getEstadoPagoIcon(orden) }}</mat-icon>
+                    {{ getEstadoPagoTexto(orden) }}
+                  </div>
+                </div>
+
+                <div class="orden-info">
+                  <div class="info-item">
+                    <mat-icon>person</mat-icon>
+                    <span>{{ orden.nombreCliente }}</span>
+                  </div>
+                  <div class="info-item">
+                    <mat-icon>schedule</mat-icon>
+                    <span>{{ orden.fRecepcion | date:'HH:mm' }}</span>
+                  </div>
+                </div>
+
+                <div class="orden-montos">
+                  <div class="monto-item">
+                    <span class="monto-label">Total</span>
+                    <span class="monto-value">S/ {{ orden.totalFinal | number:'1.2-2' }}</span>
+                  </div>
+                  <div class="monto-item">
+                    <span class="monto-label">Pagado</span>
+                    <span class="monto-value pagado">S/ {{ orden.montoPagado | number:'1.2-2' }}</span>
+                  </div>
+                  <div class="monto-item">
+                    <span class="monto-label">Saldo</span>
+                    <span class="monto-value saldo">S/ {{ orden.saldoPendiente | number:'1.2-2' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- TAB 2: Pendientes de otros días -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>warning</mat-icon>
+            Pendientes de Otros Días ({{ ordenesPendientes.length }})
+          </ng-template>
+
+          <div class="tab-content">
+            <!-- Loading -->
+            <div *ngIf="cargandoOrdenes" class="loading-container">
+              <mat-spinner diameter="40"></mat-spinner>
+              <p>Cargando órdenes...</p>
+            </div>
+
+            <!-- Empty -->
+            <div *ngIf="!cargandoOrdenes && ordenesPendientes.length === 0" class="empty-message">
+              <mat-icon>check_circle</mat-icon>
+              <p>No hay órdenes pendientes de días anteriores</p>
+            </div>
+
+            <!-- Lista de pendientes -->
+            <div class="ordenes-list" *ngIf="!cargandoOrdenes && ordenesPendientes.length > 0">
+              <div class="orden-item" 
+                   *ngFor="let orden of ordenesPendientes"
+                   (click)="verOrden(orden.idOrden)">
+                
+                <div class="orden-header">
+                  <div class="orden-numero">
+                    <strong>{{ orden.numeroOrden }}</strong>
+                    <mat-chip class="chip-anterior" appearance="outlined">
+                      {{ orden.fRecepcion | date:'dd/MM' }}
+                    </mat-chip>
+                  </div>
+                  
+                  <div class="estado-pago" [class]="getEstadoPagoClass(orden)">
+                    <mat-icon>{{ getEstadoPagoIcon(orden) }}</mat-icon>
+                    {{ getEstadoPagoTexto(orden) }}
+                  </div>
+                </div>
+
+                <div class="orden-info">
+                  <div class="info-item">
+                    <mat-icon>person</mat-icon>
+                    <span>{{ orden.nombreCliente }}</span>
+                  </div>
+                  <div class="info-item">
+                    <mat-icon>calendar_today</mat-icon>
+                    <span>{{ orden.fRecepcion | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                </div>
+
+                <div class="orden-montos">
+                  <div class="monto-item">
+                    <span class="monto-label">Total</span>
+                    <span class="monto-value">S/ {{ orden.totalFinal | number:'1.2-2' }}</span>
+                  </div>
+                  <div class="monto-item">
+                    <span class="monto-label">Pagado</span>
+                    <span class="monto-value pagado">S/ {{ orden.montoPagado | number:'1.2-2' }}</span>
+                  </div>
+                  <div class="monto-item">
+                    <span class="monto-label">Saldo</span>
+                    <span class="monto-value saldo">S/ {{ orden.saldoPendiente | number:'1.2-2' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+      </mat-tab-group>
+    </mat-card>
+
+    <!-- ========== DETALLES FINANCIEROS ========== -->
+    <div class="detail-grid">
+      
+      <!-- Ventas -->
+      <mat-card class="detail-card">
+        <div class="card-header">
+          <mat-icon>receipt</mat-icon>
+          <h3>Detalle de Ventas</h3>
+        </div>
+        <div class="card-content">
+          <div class="detail-item">
+            <span class="label">Venta Bruta</span>
+            <span class="value">S/ {{ caja.ventaBruta | number:'1.2-2' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Descuentos</span>
+            <span class="value" style="color: #f44336;">-S/ {{ caja.totalDescuentos | number:'1.2-2' }}</span>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="detail-item total">
+            <span class="label">Venta Neta</span>
+            <span class="value">S/ {{ caja.ventaNeta | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </mat-card>
+
+      <!-- Cobros por tipo -->
+      <mat-card class="detail-card">
+        <div class="card-header">
+          <mat-icon>payment</mat-icon>
+          <h3>Cobros por Tipo de Pago</h3>
+        </div>
+        <div class="card-content">
+          
+          <div class="pago-item efectivo">
+            <div class="pago-info">
+              <mat-icon>payments</mat-icon>
+              <span class="pago-label">Efectivo</span>
+            </div>
+            <div class="pago-valores">
+              <span class="pago-monto">S/ {{ caja.totalEfectivo | number:'1.2-2' }}</span>
+              <span class="pago-porcentaje">
+                {{ getPorcentajeTipoPago(caja.totalEfectivo || 0) | number:'1.0-0' }}%
+              </span>
+            </div>
+          </div>
+
+          <div class="pago-item yape">
+            <div class="pago-info">
+              <mat-icon>smartphone</mat-icon>
+              <span class="pago-label">Yape</span>
+            </div>
+            <div class="pago-valores">
+              <span class="pago-monto">S/ {{ caja.totalYape | number:'1.2-2' }}</span>
+              <span class="pago-porcentaje">
+                {{ getPorcentajeTipoPago(caja.totalYape || 0) | number:'1.0-0' }}%
+              </span>
+            </div>
+          </div>
+
+          <div class="pago-item plin">
+            <div class="pago-info">
+              <mat-icon>phone_android</mat-icon>
+              <span class="pago-label">Plin</span>
+            </div>
+            <div class="pago-valores">
+              <span class="pago-monto">S/ {{ caja.totalPlin | number:'1.2-2' }}</span>
+              <span class="pago-porcentaje">
+                {{ getPorcentajeTipoPago(caja.totalPlin || 0) | number:'1.0-0' }}%
+              </span>
+            </div>
+          </div>
+
+          <div class="pago-item transferencia">
+            <div class="pago-info">
+              <mat-icon>account_balance</mat-icon>
+              <span class="pago-label">Transferencia</span>
+            </div>
+            <div class="pago-valores">
+              <span class="pago-monto">S/ {{ caja.totalTransferencia | number:'1.2-2' }}</span>
+              <span class="pago-porcentaje">
+                {{ getPorcentajeTipoPago(caja.totalTransferencia || 0) | number:'1.0-0' }}%
+              </span>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+          
+          <div class="pago-item total">
+            <div class="pago-info">
+              <mat-icon>check_circle</mat-icon>
+              <span class="pago-label">Total Cobrado</span>
+            </div>
+            <div class="pago-valores">
+              <span class="pago-monto">S/ {{ getTotalCobrado() | number:'1.2-2' }}</span>
+              <span class="pago-porcentaje">100%</span>
+            </div>
+          </div>
+          
+        </div>
+      </mat-card>
+
+    </div>
+
+    <!-- ========== ARQUEO (solo si está cerrada) ========== -->
+    <mat-card class="arqueo-card" *ngIf="caja.estado === 'CERRADA'">
+      <div class="card-header">
+        <mat-icon>calculate</mat-icon>
+        <h3>Arqueo de Efectivo</h3>
+      </div>
+      <div class="card-content">
+        <div class="arqueo-grid">
+          <div class="arqueo-item">
+            <span class="label">Monto Inicial</span>
+            <span class="value">S/ {{ caja.montoInicial | number:'1.2-2' }}</span>
+          </div>
+          <div class="arqueo-item">
+            <span class="label">+ Efectivo Cobrado</span>
+            <span class="value">S/ {{ caja.totalEfectivo | number:'1.2-2' }}</span>
+          </div>
+          <div class="arqueo-item esperado">
+            <span class="label">= Monto Esperado</span>
+            <span class="value">S/ {{ getMontoEsperado() | number:'1.2-2' }}</span>
+          </div>
+          <div class="arqueo-item real">
+            <span class="label">Monto Real Contado</span>
+            <span class="value">S/ {{ caja.montoFinal | number:'1.2-2' }}</span>
+          </div>
+          <div class="arqueo-item diferencia" [ngClass]="getDiferenciaClass()">
+            <span class="label">Diferencia</span>
+            <span class="value">
+              S/ {{ caja.diferencia | number:'1.2-2' }}
+              <mat-icon *ngIf="(caja.diferencia || 0) > 0">trending_up</mat-icon>
+              <mat-icon *ngIf="(caja.diferencia || 0) < 0">trending_down</mat-icon>
+              <mat-icon *ngIf="(caja.diferencia || 0) === 0">check_circle</mat-icon>
+            </span>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+
+  </div>
+
+</div>

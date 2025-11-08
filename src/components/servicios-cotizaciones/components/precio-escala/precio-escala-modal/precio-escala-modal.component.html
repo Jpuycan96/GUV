@@ -1,0 +1,149 @@
+<div class="modal-overlay" (click)="cancelar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>{{ editando ? 'Editar Precio por Escala' : 'Crear Precio por Escala' }}</h2>
+      <button class="btn-close" (click)="cancelar()">×</button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- Mensaje de error -->
+      <div *ngIf="error" class="alert alert-error">
+        {{ error }}
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="cargando" class="loading">
+        <div class="spinner"></div>
+        <p>Procesando...</p>
+      </div>
+
+      <!-- Formulario -->
+      <form [formGroup]="precioForm" (ngSubmit)="onSubmit()" *ngIf="!cargando">
+        
+        <!-- Campo Material -->
+        <div class="form-group">
+          <label for="idMaterial">Material *</label>
+          <select 
+            id="idMaterial"
+            formControlName="idMaterial"
+            class="form-control"
+            [class.is-invalid]="precioForm.get('idMaterial')?.invalid && precioForm.get('idMaterial')?.touched">
+            <option value="">-- Selecciona un material --</option>
+            <option *ngFor="let material of materiales" [value]="material.idMaterial">
+              {{ material.nombre }}
+            </option>
+          </select>
+          <div *ngIf="precioForm.get('idMaterial')?.invalid && precioForm.get('idMaterial')?.touched" class="error-message">
+            <span *ngIf="precioForm.get('idMaterial')?.hasError('required')">Debe seleccionar un material</span>
+          </div>
+        </div>
+
+        <!-- Campo Modelo -->
+        <div class="form-group">
+          <label for="idModelo">Modelo (Opcional)</label>
+          <select 
+            id="idModelo"
+            formControlName="idModelo"
+            class="form-control"
+            [disabled]="modelos.length === 0">
+            <option value="">-- Todos los modelos --</option>
+            <option *ngFor="let modelo of modelos" [value]="modelo.idModelo">
+              {{ modelo.codigo }} - {{ modelo.descripcion }}
+            </option>
+          </select>
+          <small class="form-hint">Si no seleccionas modelo, el precio aplicará a todos</small>
+        </div>
+
+        <!-- Rango de Cantidad -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cantidadMin">Cantidad Mínima *</label>
+            <input 
+              type="number" 
+              id="cantidadMin"
+              formControlName="cantidadMin"
+              class="form-control"
+              placeholder="Ej: 100"
+              min="1"
+              [class.is-invalid]="precioForm.get('cantidadMin')?.invalid && precioForm.get('cantidadMin')?.touched">
+            <div *ngIf="precioForm.get('cantidadMin')?.invalid && precioForm.get('cantidadMin')?.touched" class="error-message">
+              <span *ngIf="precioForm.get('cantidadMin')?.hasError('required')">Campo requerido</span>
+              <span *ngIf="precioForm.get('cantidadMin')?.hasError('min')">Debe ser mayor a 0</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cantidadMax">Cantidad Máxima</label>
+            <input 
+              type="number" 
+              id="cantidadMax"
+              formControlName="cantidadMax"
+              class="form-control"
+              placeholder="Ej: 500 (vacío = sin límite)"
+              min="1"
+              [class.is-invalid]="precioForm.get('cantidadMax')?.invalid && precioForm.get('cantidadMax')?.touched">
+            <small class="form-hint">Dejar vacío para "sin límite superior"</small>
+          </div>
+        </div>
+
+        <!-- Precio y Unidad -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="precioUnitario">Precio Unitario *</label>
+            <input 
+              type="number" 
+              id="precioUnitario"
+              formControlName="precioUnitario"
+              class="form-control"
+              placeholder="Ej: 2.50"
+              step="0.01"
+              min="0.01"
+              [class.is-invalid]="precioForm.get('precioUnitario')?.invalid && precioForm.get('precioUnitario')?.touched">
+            <div *ngIf="precioForm.get('precioUnitario')?.invalid && precioForm.get('precioUnitario')?.touched" class="error-message">
+              <span *ngIf="precioForm.get('precioUnitario')?.hasError('required')">Campo requerido</span>
+              <span *ngIf="precioForm.get('precioUnitario')?.hasError('min')">Debe ser mayor a 0</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="unidadMedida">Unidad de Medida *</label>
+            <select 
+              id="unidadMedida"
+              formControlName="unidadMedida"
+              class="form-control">
+              <option value="unidad">Unidad</option>
+              <option value="pieza">Pieza</option>
+              <option value="hoja">Hoja</option>
+              <option value="metro">Metro</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Preview del precio -->
+        <div *ngIf="precioForm.valid" class="precio-preview">
+          <strong>Vista previa:</strong>
+          <p>
+            De {{ precioForm.get('cantidadMin')?.value }} 
+            {{ precioForm.get('cantidadMax')?.value ? 'a ' + precioForm.get('cantidadMax')?.value : 'en adelante' }}
+            {{ precioForm.get('unidadMedida')?.value }}(es) = 
+            ${{ precioForm.get('precioUnitario')?.value }} c/u
+          </p>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer" *ngIf="!cargando">
+      <button class="btn btn-secondary" (click)="cancelar()">
+        Cancelar
+      </button>
+      <button class="btn btn-primary" (click)="onSubmit()" 
+              [disabled]="precioForm.invalid || cargando">
+        {{ editando ? 'Actualizar' : 'Crear' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,98 @@
+<mat-card class="materiales-section">
+  <!-- Header -->
+  <mat-card-header>
+    <div class="header-left">
+      <mat-card-title>
+        <mat-icon class="section-icon">inventory_2</mat-icon>
+        Materiales
+      </mat-card-title>
+    </div>
+    <div class="header-right">
+      <button mat-icon-button (click)="recargar()" matTooltip="Recargar">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-raised-button color="primary" (click)="abrirModalCrear()" matTooltip="Agregar material">
+        <mat-icon>add</mat-icon>
+        Agregar
+      </button>
+    </div>
+  </mat-card-header>
+
+  <!-- Contenido -->
+  <mat-card-content>
+    <!-- Mensaje de error -->
+    <div *ngIf="error" class="alert alert-error">
+      <mat-icon>error</mat-icon>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="cargando" class="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando materiales...</p>
+    </div>
+
+    <!-- Lista de materiales con Expansion Panels -->
+    <mat-accordion *ngIf="!cargando && materiales.length > 0">
+      <mat-expansion-panel 
+        *ngFor="let material of materiales"
+        (opened)="seleccionarMaterial(material)"
+        class="material-panel">
+        
+        <!-- Header del panel -->
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-icon class="material-icon">folder</mat-icon>
+            <strong>{{ material.nombre }}</strong>
+          </mat-panel-title>
+          <mat-panel-description>
+            {{ material.descripcion || 'Sin descripción' }}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <!-- Contenido expandido -->
+        <div class="material-content">
+          <!-- Info del material -->
+          <div class="material-info">
+            <p *ngIf="material.descripcion"><strong>Descripción:</strong> {{ material.descripcion }}</p>
+            <p><strong>ID:</strong> {{ material.idMaterial }}</p>
+          </div>
+
+          <!-- Acciones del material -->
+          <div class="material-actions">
+            <button mat-raised-button color="primary" (click)="abrirModalEditar(material)">
+              <mat-icon>edit</mat-icon>
+              Editar Material
+            </button>
+            <button mat-raised-button color="warn" (click)="eliminarMaterial(material.idMaterial)">
+              <mat-icon>delete</mat-icon>
+              Eliminar
+            </button>
+          </div>
+
+          <!-- Sección de modelos del material -->
+          <div class="modelos-container">
+            <mat-divider></mat-divider>
+            <h3 class="modelos-title">
+              <mat-icon>build</mat-icon>
+              Modelos de {{ material.nombre }}
+            </h3>
+            <app-modelos-section 
+              [idMaterial]="material.idMaterial!">
+            </app-modelos-section>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+
+    <!-- Estado vacío -->
+    <div *ngIf="!cargando && materiales.length === 0" class="empty-state">
+      <mat-icon class="empty-icon">inbox</mat-icon>
+      <p>No hay materiales creados</p>
+      <button mat-raised-button color="primary" (click)="abrirModalCrear()">
+        <mat-icon>add</mat-icon>
+        Crear primer material
+      </button>
+    </div>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,113 @@
+<div class="servicios-container">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>
+        <mat-icon class="title-icon">settings</mat-icon>
+        Gestión de Servicios
+      </h1>
+      <p class="subtitle">Administra los servicios disponibles para cotizaciones</p>
+    </div>
+    
+    <div class="header-actions">
+      <button mat-icon-button (click)="recargar()" matTooltip="Recargar" class="reload-btn">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-raised-button 
+              color="primary" 
+              (click)="abrirModalCrear()" 
+              class="create-btn"
+              *ngIf="puedeCrear()">
+        <mat-icon>add</mat-icon>
+        Crear Servicio
+      </button>
+    </div>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="error" class="alert alert-error">
+    <mat-icon>error</mat-icon>
+    <span>{{ error }}</span>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="cargando" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando servicios...</p>
+  </div>
+
+  <!-- Grid de servicios -->
+  <div *ngIf="!cargando && servicios.length > 0" class="servicios-grid">
+    <mat-card 
+      *ngFor="let servicio of servicios" 
+      class="servicio-card"
+      [routerLink]="['/servicios-cotizaciones/servicios', servicio.idServicio, 'dashboard']">
+      
+      <!-- Imagen o placeholder -->
+      <div class="card-image">
+        <img 
+          *ngIf="servicio.imagenUrl; else noImage" 
+          [src]="servicio.imagenUrl" 
+          [alt]="servicio.nombre"
+          class="service-img">
+        
+        <ng-template #noImage>
+          <div class="placeholder-image">
+            <mat-icon>image</mat-icon>
+          </div>
+        </ng-template>
+
+        <!-- Overlay con acciones -->
+        <div class="image-overlay">
+          <button mat-icon-button 
+                  *ngIf="puedeEditar()"
+                  (click)="abrirModalEditar(servicio, $event)" 
+                  matTooltip="Editar"
+                  class="overlay-btn">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button 
+                  *ngIf="puedeEliminar()"
+                  (click)="eliminarServicio(servicio.idServicio, $event)" 
+                  matTooltip="Eliminar"
+                  class="overlay-btn delete-btn">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenido -->
+      <mat-card-header>
+        <mat-card-title>{{ servicio.nombre }}</mat-card-title>
+        <mat-card-subtitle>
+          {{ servicio.descripcion || 'Sin descripción' }}
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-actions>
+        <button mat-button color="primary" class="dashboard-btn">
+          <mat-icon>dashboard</mat-icon>
+          Ir al Dashboard
+        </button>
+      </mat-card-actions>
+
+    </mat-card>
+  </div>
+
+  <!-- Estado vacío -->
+  <div *ngIf="!cargando && servicios.length === 0" class="empty-state">
+    <mat-icon class="empty-icon">inbox</mat-icon>
+    <h2>No hay servicios creados</h2>
+    <p>Comienza creando tu primer servicio para poder gestionar cotizaciones</p>
+    <button mat-raised-button 
+            color="primary" 
+            (click)="abrirModalCrear()" 
+            class="create-btn"
+            *ngIf="puedeCrear()">
+      <mat-icon>add</mat-icon>
+      Crear Primer Servicio
+    </button>
+  </div>
+
+</div>

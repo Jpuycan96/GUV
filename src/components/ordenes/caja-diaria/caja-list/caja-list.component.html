@@ -1,0 +1,382 @@
+<div class="caja-list-container">
+
+  <!-- ========== HEADER ========== -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>
+        <mat-icon class="title-icon">account_balance_wallet</mat-icon>
+        Cajas Diarias
+      </h1>
+      <p class="subtitle">Gestión y control de cajas por turno</p>
+    </div>
+    
+    <div class="header-actions">
+      <!-- ✅ Botón para abrir caja (si no tiene caja activa) -->
+      <button mat-stroked-button 
+              color="primary"
+              (click)="abrirModalApertura()"
+              *ngIf="puedeAbrirCaja() && !cajaActiva">
+        <mat-icon>add_circle</mat-icon>
+        Abrir Caja
+      </button>
+
+      <!-- ✅ UN SOLO botón para cerrar (si tiene caja activa) -->
+      <button mat-flat-button 
+              color="warn"
+              (click)="abrirModalCierre(cajaActiva!)"
+              *ngIf="cajaActiva">
+        <mat-icon>lock</mat-icon>
+        Cerrar Mi Caja
+      </button>
+
+      <button mat-icon-button 
+              (click)="recargar()"
+              matTooltip="Recargar">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- ========== ALERTA CAJA ACTIVA (Arriba) ========== -->
+  <div class="caja-activa-alert" *ngIf="cajaActiva">
+    <mat-icon>info</mat-icon>
+    <div class="alert-content">
+      <strong>Caja Abierta:</strong> 
+      {{ cajaActiva.nombreTurno }} - 
+      Abierta desde {{ cajaActiva.fApertura | date:'dd/MM/yyyy HH:mm' }}
+    </div>
+    <!-- ✅ Este botón redirige al resumen completo -->
+    <button mat-button 
+            color="primary"
+            (click)="verDetalle(cajaActiva.idCaja)">
+      Ver Resumen Completo
+    </button>
+  </div>
+
+  <!-- ========== ESTADÍSTICAS (solo para admin) ========== -->
+  <div class="stats-grid" *ngIf="esAdministrador">
+    <mat-card class="stat-card abiertas">
+      <div class="stat-icon">
+        <mat-icon>lock_open</mat-icon>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats.cajasAbiertas }}</div>
+        <div class="stat-label">Cajas Abiertas</div>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card ventas">
+      <div class="stat-icon">
+        <mat-icon>trending_up</mat-icon>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">S/ {{ stats.totalVentas | number:'1.2-2' }}</div>
+        <div class="stat-label">Ventas Totales</div>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card efectivo">
+      <div class="stat-icon">
+        <mat-icon>payments</mat-icon>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">S/ {{ stats.totalEfectivo | number:'1.2-2' }}</div>
+        <div class="stat-label">Total Efectivo</div>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card digital">
+      <div class="stat-icon">
+        <mat-icon>smartphone</mat-icon>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">S/ {{ stats.totalDigital | number:'1.2-2' }}</div>
+        <div class="stat-label">Pagos Digitales</div>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card pendiente">
+      <div class="stat-icon">
+        <mat-icon>schedule</mat-icon>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">S/ {{ stats.totalPendiente | number:'1.2-2' }}</div>
+        <div class="stat-label">Saldo Pendiente</div>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- ========== FILTROS COLAPSABLES (solo para admin) ========== -->
+  <mat-card class="filtros-card" *ngIf="esAdministrador">
+    <div class="filtros-header" (click)="toggleFiltros()">
+      <h3>
+        <mat-icon>filter_list</mat-icon>
+        Filtros
+      </h3>
+      <mat-icon class="expand-icon">
+        {{ filtrosExpandidos ? 'expand_less' : 'expand_more' }}
+      </mat-icon>
+    </div>
+
+    <div class="filtros-content" *ngIf="filtrosExpandidos">
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha Desde</mat-label>
+        <input matInput 
+               [matDatepicker]="pickerDesde" 
+               [(ngModel)]="filtroFechaDesde">
+        <mat-datepicker-toggle matSuffix [for]="pickerDesde"></mat-datepicker-toggle>
+        <mat-datepicker #pickerDesde></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha Hasta</mat-label>
+        <input matInput 
+               [matDatepicker]="pickerHasta" 
+               [(ngModel)]="filtroFechaHasta">
+        <mat-datepicker-toggle matSuffix [for]="pickerHasta"></mat-datepicker-toggle>
+        <mat-datepicker #pickerHasta></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Estado</mat-label>
+        <mat-select [(ngModel)]="filtroEstado">
+          <mat-option value="TODAS">Todas</mat-option>
+          <mat-option value="ABIERTA">Abiertas</mat-option>
+          <mat-option value="CERRADA">Cerradas</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="filtros-actions">
+        <button mat-stroked-button 
+                color="primary"
+                (click)="aplicarFiltros()">
+          <mat-icon>search</mat-icon>
+          Buscar
+        </button>
+
+        <button mat-button 
+                (click)="limpiarFiltros()">
+          <mat-icon>clear</mat-icon>
+          Limpiar
+        </button>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- ========== LOADING ========== -->
+  <div *ngIf="cargando" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando cajas...</p>
+  </div>
+
+  <!-- ========== ERROR ========== -->
+  <div *ngIf="error && !cargando" class="alert alert-error">
+    <mat-icon>error</mat-icon>
+    <span>{{ error }}</span>
+  </div>
+
+  <!-- ========== TABLA DE CAJAS (solo para admin) ========== -->
+  <mat-card class="tabla-card" *ngIf="!cargando && !error && esAdministrador">
+    <div class="tabla-header">
+      <h3>
+        <mat-icon>list</mat-icon>
+        Historial de Cajas ({{ cajas.length }})
+      </h3>
+    </div>
+
+    <div *ngIf="cajas.length === 0" class="empty-message">
+      <mat-icon>inbox</mat-icon>
+      <p>No hay cajas registradas con los filtros seleccionados</p>
+    </div>
+
+    <div class="tabla-container" *ngIf="cajas.length > 0">
+      <table mat-table [dataSource]="cajas" class="cajas-table">
+
+        <ng-container matColumnDef="nombreTurno">
+          <th mat-header-cell *matHeaderCellDef>Turno</th>
+          <td mat-cell *matCellDef="let caja">
+            <strong>{{ caja.nombreTurno }}</strong>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef>Fecha</th>
+          <td mat-cell *matCellDef="let caja">
+            {{ caja.fecha | date:'dd/MM/yyyy' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="nombreCajero">
+          <th mat-header-cell *matHeaderCellDef>Cajero</th>
+          <td mat-cell *matCellDef="let caja">
+            {{ caja.nombreCajero }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="fApertura">
+          <th mat-header-cell *matHeaderCellDef>Hora Apertura</th>
+          <td mat-cell *matCellDef="let caja">
+            {{ caja.fApertura | date:'HH:mm' }}
+          </td>
+        </ng-container>
+
+        <!-- ✅ NUEVA COLUMNA: HORA DE CIERRE -->
+        <ng-container matColumnDef="fCierre">
+          <th mat-header-cell *matHeaderCellDef>Hora Cierre</th>
+          <td mat-cell *matCellDef="let caja">
+            <span *ngIf="caja.fCierre" class="hora-cierre">
+              {{ caja.fCierre | date:'HH:mm' }}
+            </span>
+            <span *ngIf="!caja.fCierre" class="sin-cierre">-</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="totalOrdenes">
+          <th mat-header-cell *matHeaderCellDef>Órdenes</th>
+          <td mat-cell *matCellDef="let caja">
+            <mat-chip class="chip-ordenes">
+              {{ caja.totalOrdenes || 0 }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="ventaNeta">
+          <th mat-header-cell *matHeaderCellDef>Venta Neta</th>
+          <td mat-cell *matCellDef="let caja">
+            <strong class="monto-venta">
+              S/ {{ caja.ventaNeta | number:'1.2-2' }}
+            </strong>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="totalEfectivo">
+          <th mat-header-cell *matHeaderCellDef>Efectivo</th>
+          <td mat-cell *matCellDef="let caja">
+            <span class="monto-efectivo">
+              S/ {{ caja.totalEfectivo | number:'1.2-2' }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="totalDigital">
+          <th mat-header-cell *matHeaderCellDef>Digital</th>
+          <td mat-cell *matCellDef="let caja">
+            <span class="monto-digital">
+              S/ {{ getTotalDigital(caja) | number:'1.2-2' }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="totalPendiente">
+          <th mat-header-cell *matHeaderCellDef>Pendiente</th>
+          <td mat-cell *matCellDef="let caja">
+            <span class="monto-pendiente" *ngIf="caja.totalPendiente && caja.totalPendiente > 0">
+              S/ {{ caja.totalPendiente | number:'1.2-2' }}
+            </span>
+            <span *ngIf="!caja.totalPendiente || caja.totalPendiente === 0">-</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let caja">
+            <mat-chip [class]="getEstadoClass(caja.estado)">
+              {{ caja.estado }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let caja">
+            <button mat-icon-button 
+                    (click)="verDetalle(caja.idCaja)"
+                    matTooltip="Ver detalle">
+              <mat-icon>visibility</mat-icon>
+            </button>
+
+            <button mat-icon-button 
+                    color="warn"
+                    (click)="abrirModalCierre(caja)"
+                    *ngIf="caja.estado === 'ABIERTA' && puedeCerrarCaja()"
+                    matTooltip="Cerrar caja">
+              <mat-icon>lock</mat-icon>
+            </button>
+
+            <button mat-icon-button 
+                    (click)="recalcularTotales(caja)"
+                    *ngIf="permisos.tiene('cajas', 'editar')"
+                    matTooltip="Recalcular totales">
+              <mat-icon>refresh</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+  </mat-card>
+
+      <!-- ========== VISTA CAJERO: Caja activa + órdenes del turno ========== -->
+      <div *ngIf="esCajero && !esAdministrador && !cargando">
+        
+        <!-- ✅ Tarjeta de Caja Activa -->
+        <mat-card class="caja-activa-card" *ngIf="cajaActiva">
+          <div class="caja-activa-header">
+            <h2>Mi Caja Activa</h2>
+          </div>
+
+          <div class="caja-activa-stats">
+            <!-- Órdenes -->
+            <div class="stat-item">
+              <mat-icon>shopping_cart</mat-icon>
+              <div class="stat-info">
+                <span class="stat-label">Órdenes</span>
+                <span class="stat-value">{{ cajaActiva.totalOrdenes || 0 }}</span>
+              </div>
+            </div>
+
+            <!-- Venta Neta -->
+            <div class="stat-item">
+              <mat-icon>trending_up</mat-icon>
+              <div class="stat-info">
+                <span class="stat-label">Venta Neta</span>
+                <span class="stat-value">S/ {{ cajaActiva.ventaNeta | number:'1.2-2' }}</span>
+              </div>
+            </div>
+
+            <!-- Total Cobrado -->
+            <div class="stat-item">
+              <mat-icon>payments</mat-icon>
+              <div class="stat-info">
+                <span class="stat-label">Total Cobrado</span>
+                <span class="stat-value">S/ {{ getTotalCobrado(cajaActiva) | number:'1.2-2' }}</span>
+              </div>
+            </div>
+
+            <!-- Pendiente -->
+            <div class="stat-item">
+              <mat-icon>schedule</mat-icon>
+              <div class="stat-info">
+                <span class="stat-label">Pendiente</span>
+                <span class="stat-value">S/ {{ cajaActiva.totalPendiente | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+
+        <!-- ✅ Sin caja activa -->
+        <div class="empty-message" *ngIf="!cajaActiva">
+          <mat-icon>inbox</mat-icon>
+          <p>No tienes una caja activa</p>
+          <button mat-stroked-button 
+                  color="primary"
+                  (click)="abrirModalApertura()">
+            <mat-icon>add_circle</mat-icon>
+            Abrir Caja
+          </button>
+        </div>
+      </div>
+
+      </div>

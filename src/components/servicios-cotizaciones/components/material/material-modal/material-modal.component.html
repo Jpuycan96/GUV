@@ -1,0 +1,89 @@
+<div class="modal-overlay" (click)="cancelar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>{{ editando ? 'Editar Material' : 'Crear Nuevo Material' }}</h2>
+      <button class="btn-close" (click)="cancelar()">×</button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- Mensaje de error -->
+      <div *ngIf="error" class="alert alert-error">
+        {{ error }}
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="cargando" class="loading">
+        <div class="spinner"></div>
+        <p>Procesando...</p>
+      </div>
+
+      <!-- Formulario -->
+      <form [formGroup]="materialForm" (ngSubmit)="onSubmit()" *ngIf="!cargando">
+        
+        <!-- Campo Servicio -->
+        <div class="form-group">
+          <label for="idServicio">Servicio *</label>
+          <select 
+            id="idServicio"
+            formControlName="idServicio"
+            class="form-control"
+            [class.is-invalid]="materialForm.get('idServicio')?.invalid && materialForm.get('idServicio')?.touched">
+            <option value="">-- Selecciona un servicio --</option>
+            <option *ngFor="let servicio of servicios" [value]="servicio.idServicio">
+              {{ servicio.nombre }}
+            </option>
+          </select>
+          <div *ngIf="materialForm.get('idServicio')?.invalid && materialForm.get('idServicio')?.touched" class="error-message">
+            <span *ngIf="materialForm.get('idServicio')?.hasError('required')">Debe seleccionar un servicio</span>
+          </div>
+        </div>
+
+        <!-- Campo Nombre -->
+        <div class="form-group">
+          <label for="nombre">Nombre del Material *</label>
+          <input 
+            type="text" 
+            id="nombre"
+            formControlName="nombre"
+            class="form-control"
+            placeholder="Ej: Papel Brillante"
+            [class.is-invalid]="materialForm.get('nombre')?.invalid && materialForm.get('nombre')?.touched">
+          <div *ngIf="materialForm.get('nombre')?.invalid && materialForm.get('nombre')?.touched" class="error-message">
+            <span *ngIf="materialForm.get('nombre')?.hasError('required')">El nombre es requerido</span>
+            <span *ngIf="materialForm.get('nombre')?.hasError('minlength')">Mínimo 3 caracteres</span>
+            <span *ngIf="materialForm.get('nombre')?.hasError('maxlength')">Máximo 100 caracteres</span>
+          </div>
+        </div>
+
+        <!-- Campo Descripción -->
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <textarea 
+            id="descripcion"
+            formControlName="descripcion"
+            class="form-control"
+            rows="3"
+            placeholder="Describe las características del material"
+            [class.is-invalid]="materialForm.get('descripcion')?.invalid && materialForm.get('descripcion')?.touched">
+          </textarea>
+          <div *ngIf="materialForm.get('descripcion')?.invalid && materialForm.get('descripcion')?.touched" class="error-message">
+            <span *ngIf="materialForm.get('descripcion')?.hasError('maxlength')">Máximo 255 caracteres</span>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer" *ngIf="!cargando">
+      <button class="btn btn-secondary" (click)="cancelar()">
+        Cancelar
+      </button>
+      <button class="btn btn-primary" (click)="onSubmit()" 
+              [disabled]="materialForm.invalid || cargando">
+        {{ editando ? 'Actualizar' : 'Crear' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,412 @@
+.usuarios-container {
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* Header */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-content h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.title-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: #1976d2;
+}
+
+.subtitle {
+  margin: 8px 0 0 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.reload-btn {
+  color: #666;
+}
+
+.create-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px;
+  height: 40px;
+}
+
+/* Estadísticas */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  cursor: default;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: white;
+}
+
+.stat-icon.blue {
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+}
+
+.stat-icon.green {
+  background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+}
+
+.stat-icon.orange {
+  background: linear-gradient(135deg, #fb8c00 0%, #ef6c00 100%);
+}
+
+.stat-icon.red {
+  background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* Filtros */
+.filters-card {
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.filters-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filters-header h3 mat-icon {
+  color: #1976d2;
+}
+
+.clear-filters-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.search-field {
+  grid-column: span 2;
+}
+
+/* Alert */
+.alert {
+  padding: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.alert-error {
+  background-color: #ffebee;
+  color: #c62828;
+  border-left: 4px solid #c62828;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 16px;
+}
+
+.loading-container p {
+  color: #666;
+  font-size: 14px;
+}
+
+/* Tabla */
+.table-card {
+  overflow: hidden;
+}
+
+.usuarios-table {
+  width: 100%;
+}
+
+.usuarios-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+  padding: 16px;
+  font-size: 14px;
+}
+
+.usuarios-table td {
+  padding: 16px;
+  font-size: 14px;
+}
+
+.table-row {
+  transition: background-color 0.2s;
+}
+
+.table-row:hover {
+  background-color: #f5f5f5;
+}
+
+/* Usuario ID */
+.user-id {
+  color: #1976d2;
+  font-size: 14px;
+}
+
+/* Usuario info */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #666;
+}
+
+/* Username */
+.username {
+  font-family: 'Courier New', monospace;
+  background-color: #f5f5f5;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+/* Roles */
+.roles-container {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.no-roles {
+  color: #999;
+  font-style: italic;
+  font-size: 12px;
+}
+
+.rol-admin {
+  background-color: #e3f2fd !important;
+  color: #1976d2 !important;
+  font-size: 12px !important;
+}
+
+.rol-vendedor {
+  background-color: #e8f5e9 !important;
+  color: #2e7d32 !important;
+  font-size: 12px !important;
+}
+
+.rol-cajero {
+  background-color: #fff3e0 !important;
+  color: #ef6c00 !important;
+  font-size: 12px !important;
+}
+
+.rol-produccion {
+  background-color: #f3e5f5 !important;
+  color: #7b1fa2 !important;
+  font-size: 12px !important;
+}
+
+.rol-diseñador {
+  background-color: #e0f2f1 !important;
+  color: #00796b !important;
+  font-size: 12px !important;
+}
+
+.rol-default {
+  background-color: #f5f5f5 !important;
+  color: #666 !important;
+  font-size: 12px !important;
+}
+
+/* Estados */
+.estado-activo {
+  background-color: #e8f5e9 !important;
+  color: #2e7d32 !important;
+}
+
+.estado-inactivo {
+  background-color: #ffebee !important;
+  color: #c62828 !important;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.empty-icon {
+  font-size: 80px;
+  width: 80px;
+  height: 80px;
+  color: #bdbdbd;
+  margin-bottom: 16px;
+}
+
+.empty-state h2 {
+  color: #333;
+  margin: 16px 0 8px 0;
+}
+
+.empty-state p {
+  color: #666;
+  margin-bottom: 24px;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .usuarios-table {
+    font-size: 13px;
+  }
+  
+  .usuarios-table th,
+  .usuarios-table td {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .search-field {
+    grid-column: span 1;
+  }
+
+  .table-card {
+    overflow-x: auto;
+  }
+
+  .usuarios-table {
+    min-width: 900px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-card {
+    padding: 16px;
+  }
+
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .stat-icon mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
+}

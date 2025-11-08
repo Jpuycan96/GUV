@@ -1,0 +1,447 @@
+<div class="orden-detail-container">
+
+  <!-- Loading -->
+  <div *ngIf="cargando" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando orden...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !cargando" class="alert alert-error">
+    <mat-icon>error</mat-icon>
+    <span>{{ error }}</span>
+    <button mat-button (click)="volver()">Volver</button>
+  </div>
+
+  <!-- Contenido principal -->
+  <div *ngIf="orden && !cargando">
+    
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-left">
+        <button mat-icon-button (click)="volver()" class="back-btn">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div class="header-content">
+          <h1>
+            <mat-icon class="title-icon">receipt_long</mat-icon>
+            {{ orden.numeroOrden }}
+            <mat-chip *ngIf="orden.esCotizacion" class="chip-cotizacion">
+              COTIZACIÓN
+            </mat-chip>
+            <mat-chip [class]="getEstadoClass(orden.estado)">
+              {{ getEstadoLabel(orden.estado) }}
+            </mat-chip>
+          </h1>
+          <!-- ✅ MOSTRAR FECHA DE REGISTRO -->
+          <p class="subtitle">
+            Registrada el {{ orden.fRecepcion | date:'dd/MM/yyyy HH:mm' }}
+          </p>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <button mat-icon-button (click)="imprimirOrden()" matTooltip="Imprimir">
+          <mat-icon>print</mat-icon>
+        </button>
+        
+        <button mat-button 
+                *ngIf="orden.esCotizacion"
+                (click)="convertirAOrden()"
+                color="accent">
+          <mat-icon>transform</mat-icon>
+          Convertir a Orden
+        </button>
+
+        <!-- ✅ BOTÓN REGISTRAR PAGO - SOLO ADMINISTRADOR Y CAJERO -->
+        <button mat-raised-button 
+                color="primary"
+                (click)="abrirModalPago()"
+                *ngIf="puedeRegistrarPago()"
+                [disabled]="(orden.saldoPendiente || 0) <= 0">
+          <mat-icon>payment</mat-icon>
+          Registrar Pago
+        </button>
+
+        <button mat-icon-button 
+                [matMenuTriggerFor]="menu"
+                class="more-btn">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        
+        <mat-menu #menu="matMenu">
+          <!-- ✅ EMITIR COMPROBANTE - SOLO ADMINISTRADOR -->
+          <button mat-menu-item 
+                  (click)="abrirModalComprobante()"
+                  *ngIf="puedeEmitirComprobante()">
+            <mat-icon>receipt</mat-icon>
+            <span>Emitir Comprobante</span>
+          </button>
+          <button mat-menu-item (click)="eliminarOrden()">
+            <mat-icon color="warn">delete</mat-icon>
+            <span>Eliminar Orden</span>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+
+    <!-- Cards de información -->
+    <div class="info-grid">
+      
+      <!-- Cliente -->
+      <mat-card class="info-card">
+        <div class="card-header">
+          <mat-icon>person</mat-icon>
+          <h3>Cliente</h3>
+        </div>
+        <div class="card-content">
+          <div class="info-item">
+            <span class="label">Nombre:</span>
+            <span class="value">{{ orden.nombreCliente }}</span>
+          </div>
+          <div class="info-item" *ngIf="orden.razonSocial">
+            <span class="label">Razón Social:</span>
+            <span class="value">{{ orden.razonSocial }}</span>
+          </div>
+          <div class="info-item" *ngIf="orden.telefono">
+            <span class="label">Teléfono:</span>
+            <span class="value">{{ orden.telefono }}</span>
+          </div>
+          <div class="info-item" *ngIf="orden.email">
+            <span class="label">Email:</span>
+            <span class="value">{{ orden.email }}</span>
+          </div>
+          <div class="info-item" *ngIf="orden.direccion">
+            <span class="label">Dirección:</span>
+            <span class="value">{{ orden.direccion }}</span>
+          </div>
+        </div>
+      </mat-card>
+
+      <!-- ✅ Vendedor y LAS 3 FECHAS -->
+      <mat-card class="info-card">
+        <div class="card-header">
+          <mat-icon>business_center</mat-icon>
+          <h3>Información General</h3>
+        </div>
+        <div class="card-content">
+          <div class="info-item">
+            <span class="label">Vendedor:</span>
+            <span class="value">{{ orden.nombreVendedor }}</span>
+          </div>
+          
+          <!-- ✅ FECHA 1: Fecha de Registro (fRecepcion) -->
+          <div class="info-item">
+            <span class="label">
+              <mat-icon inline class="fecha-icon">event</mat-icon>
+              Fecha de Registro:
+            </span>
+            <span class="value fecha-valor">
+              {{ orden.fRecepcion | date:'dd/MM/yyyy HH:mm' }}
+            </span>
+          </div>
+          
+          <!-- ✅ FECHA 2: Fecha de Entrega Acordada (fEntregaAcordada) -->
+          <div class="info-item" *ngIf="orden.fEntregaAcordada">
+            <span class="label">
+              <mat-icon inline class="fecha-icon">event_available</mat-icon>
+              Entrega Acordada:
+            </span>
+            <span class="value fecha-valor fecha-acordada">
+              {{ orden.fEntregaAcordada | date:'dd/MM/yyyy HH:mm' }}
+            </span>
+          </div>
+          
+          <!-- ✅ FECHA 3: Fecha de Entrega Real (fEntregaReal) -->
+          <div class="info-item" *ngIf="orden.fEntregaReal">
+            <span class="label">
+              <mat-icon inline class="fecha-icon">event_note</mat-icon>
+              Entrega Real:
+            </span>
+            <span class="value fecha-valor fecha-real">
+              {{ orden.fEntregaReal | date:'dd/MM/yyyy HH:mm' }}
+            </span>
+          </div>
+
+          <!-- ✅ BOTÓN para registrar entrega real (si no existe) -->
+          <div class="info-item" *ngIf="!orden.fEntregaReal && orden.estado === 'COMPLETADO'">
+            <button mat-raised-button 
+                    color="accent"
+                    (click)="registrarEntregaReal()">
+              <mat-icon>event_available</mat-icon>
+              Registrar Entrega Real
+            </button>
+          </div>
+          
+          <div class="info-item">
+            <span class="label">Estado:</span>
+            <mat-form-field appearance="outline" class="estado-select">
+              <mat-select [value]="orden.estado" (selectionChange)="cambiarEstado($event.value)">
+                <mat-option *ngFor="let est of estadosDisponibles" [value]="est.value">
+                  {{ est.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      </mat-card>
+
+      <!-- Resumen financiero -->
+      <mat-card class="info-card financial-card">
+        <div class="card-header">
+          <mat-icon>attach_money</mat-icon>
+          <h3>Resumen Financiero</h3>
+        </div>
+        <div class="card-content">
+          <div class="financial-item">
+            <span class="label">Subtotal:</span>
+            <span class="value">S/ {{ orden.subtotal | number:'1.2-2' }}</span>
+          </div>
+          <div class="financial-item" *ngIf="orden.totalExtras">
+            <span class="label">Extras:</span>
+            <span class="value extra">S/ {{ orden.totalExtras | number:'1.2-2' }}</span>
+          </div>
+          <div class="financial-item" *ngIf="orden.descuento">
+            <span class="label">Descuento:</span>
+            <span class="value descuento">-S/ {{ orden.descuento | number:'1.2-2' }}</span>
+          </div>
+          <div class="financial-item total">
+            <span class="label">TOTAL:</span>
+            <span class="value">S/ {{ orden.totalFinal | number:'1.2-2' }}</span>
+          </div>
+          <div class="financial-item pagado">
+            <span class="label">Pagado:</span>
+            <span class="value">S/ {{ orden.montoPagado || 0 | number:'1.2-2' }}</span>
+          </div>
+          <div class="financial-item saldo" [class.pendiente]="(orden.saldoPendiente || 0) > 0">
+            <span class="label">Saldo:</span>
+            <span class="value">S/ {{ orden.saldoPendiente || 0 | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </mat-card>
+
+    </div>
+
+    <!-- Observaciones -->
+    <mat-card *ngIf="orden.observaciones" class="observaciones-card">
+      <div class="card-header">
+        <mat-icon>note</mat-icon>
+        <h3>Observaciones</h3>
+      </div>
+      <div class="card-content">
+        <p>{{ orden.observaciones }}</p>
+      </div>
+    </mat-card>
+
+    <!-- Tabs -->
+    <mat-card class="tabs-card">
+      <mat-tab-group>
+        
+        <!-- Tab Detalles -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>list</mat-icon>
+            Detalles ({{ detalles.length }})
+          </ng-template>
+          
+          <div class="tab-content">
+            <div *ngIf="detalles.length === 0" class="empty-message">
+              <mat-icon>inbox</mat-icon>
+              <p>No hay detalles en esta orden</p>
+            </div>
+
+            <div class="detalles-list">
+              <app-orden-detalle-item 
+                *ngFor="let detalle of detalles; let i = index"
+                [detalle]="detalle"
+                [numero]="i + 1">
+              </app-orden-detalle-item>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Tab Pagos -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>payment</mat-icon>
+            Pagos ({{ pagos.length }})
+          </ng-template>
+          
+          <div class="tab-content">
+            <div class="tab-header">
+              <h3>Historial de Pagos</h3>
+              <!-- ✅ BOTÓN NUEVO PAGO - SOLO ADMINISTRADOR Y CAJERO -->
+              <button mat-raised-button 
+                      color="primary" 
+                      (click)="abrirModalPago()"
+                      *ngIf="puedeRegistrarPago()"
+                      [disabled]="(orden.saldoPendiente || 0) <= 0">
+                <mat-icon>add</mat-icon>
+                Nuevo Pago
+              </button>
+            </div>
+
+            <div *ngIf="pagos.length === 0" class="empty-message">
+              <mat-icon>receipt_long</mat-icon>
+              <p>No hay pagos registrados</p>
+            </div>
+
+            <!-- ✅ TABLA ACTUALIZADA CON FECHA Y CAJERO -->
+            <table mat-table [dataSource]="pagos" *ngIf="pagos.length > 0" class="pagos-table">
+              
+              <!-- ✅ COLUMNA FECHA -->
+              <ng-container matColumnDef="fecha">
+                <th mat-header-cell *matHeaderCellDef>Fecha</th>
+                <td mat-cell *matCellDef="let pago">
+                  <span *ngIf="pago.fPago">
+                    {{ pago.fPago | date:'dd/MM/yyyy HH:mm' }}
+                  </span>
+                  <span *ngIf="!pago.fPago" class="sin-fecha">-</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="monto">
+                <th mat-header-cell *matHeaderCellDef>Monto</th>
+                <td mat-cell *matCellDef="let pago">
+                  <span class="monto-pago">S/ {{ pago.monto | number:'1.2-2' }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="tipoPago">
+                <th mat-header-cell *matHeaderCellDef>Tipo de Pago</th>
+                <td mat-cell *matCellDef="let pago">{{ pago.nombreTipoPago }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="operacion">
+                <th mat-header-cell *matHeaderCellDef>N° Operación</th>
+                <td mat-cell *matCellDef="let pago">
+                  {{ pago.numeroOperacion || '-' }}
+                </td>
+              </ng-container>
+
+              <!-- ✅ CAMBIAR "Usuario" POR "Cajero" -->
+              <ng-container matColumnDef="cajero">
+                <th mat-header-cell *matHeaderCellDef>Cajero</th>
+                <td mat-cell *matCellDef="let pago">
+                  <span *ngIf="pago.nombreUsuario">{{ pago.nombreUsuario }}</span>
+                  <span *ngIf="!pago.nombreUsuario" class="sin-cajero">-</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let pago">
+                  <!-- ✅ BOTÓN ANULAR PAGO - SOLO ADMINISTRADOR Y CAJERO -->
+                  <button mat-icon-button 
+                          color="warn"
+                          (click)="anularPago(pago.idPago)"
+                          *ngIf="puedeAnularPago() && !pago.anulado"
+                          matTooltip="Anular pago">
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="columnasPagos"></tr>
+              <tr mat-row *matRowDef="let row; columns: columnasPagos;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+
+        <!-- Tab Comprobantes -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>description</mat-icon>
+            Comprobantes ({{ comprobantes.length }})
+          </ng-template>
+          
+          <div class="tab-content">
+            <div class="tab-header">
+              <h3>Comprobantes Emitidos</h3>
+              <!-- ✅ BOTÓN EMITIR COMPROBANTE - SOLO ADMINISTRADOR -->
+              <button mat-raised-button 
+                      color="primary" 
+                      (click)="abrirModalComprobante()"
+                      *ngIf="puedeEmitirComprobante()">
+                <mat-icon>add</mat-icon>
+                Emitir Comprobante
+              </button>
+            </div>
+
+            <div *ngIf="comprobantes.length === 0" class="empty-message">
+              <mat-icon>description</mat-icon>
+              <p>No hay comprobantes emitidos</p>
+            </div>
+
+            <table mat-table [dataSource]="comprobantes" *ngIf="comprobantes.length > 0" class="comprobantes-table">
+              
+              <ng-container matColumnDef="tipo">
+                <th mat-header-cell *matHeaderCellDef>Tipo</th>
+                <td mat-cell *matCellDef="let comp">
+                  <mat-chip [class.boleta]="comp.tipoComprobante === 'BOLETA'" 
+                           [class.factura]="comp.tipoComprobante === 'FACTURA'">
+                    {{ comp.tipoComprobante }}
+                  </mat-chip>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="numero">
+                <th mat-header-cell *matHeaderCellDef>Número</th>
+                <td mat-cell *matCellDef="let comp">
+                  <strong>{{ comp.serie }}-{{ comp.numero }}</strong>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="fecha">
+                <th mat-header-cell *matHeaderCellDef>Fecha Emisión</th>
+                <td mat-cell *matCellDef="let comp">
+                  {{ comp.fEmision | date:'dd/MM/yyyy HH:mm' }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="total">
+                <th mat-header-cell *matHeaderCellDef>Total</th>
+                <td mat-cell *matCellDef="let comp">
+                  <span class="monto-comprobante">S/ {{ comp.total | number:'1.2-2' }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado SUNAT</th>
+                <td mat-cell *matCellDef="let comp">
+                  <mat-chip [class]="getEstadoSunatClass(comp.estadoSunat)">
+                    {{ comp.estadoSunat || 'SIN ENVIAR' }}
+                  </mat-chip>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let comp">
+                  <button mat-icon-button 
+                          matTooltip="Descargar PDF">
+                    <mat-icon>download</mat-icon>
+                  </button>
+                  <!-- ✅ BOTÓN ANULAR COMPROBANTE - SOLO ADMINISTRADOR -->
+                  <button mat-icon-button 
+                          color="warn"
+                          (click)="anularComprobante(comp.idComprobante)"
+                          *ngIf="puedeEmitirComprobante()"
+                          matTooltip="Anular">
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="columnasComprobantes"></tr>
+              <tr mat-row *matRowDef="let row; columns: columnasComprobantes;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+
+      </mat-tab-group>
+    </mat-card>
+
+  </div>
+
+</div>

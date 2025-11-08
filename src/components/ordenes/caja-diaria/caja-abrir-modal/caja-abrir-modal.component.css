@@ -1,0 +1,182 @@
+.modal-container {
+  max-width: 500px;
+  width: 100%;
+}
+
+/* ========== HEADER ========== */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.5rem;
+  color: #1976d2;
+}
+
+.header-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+.close-button {
+  color: #666;
+}
+
+/* ========== CONTENT ========== */
+.modal-content {
+  padding: 24px;
+  min-height: 200px;
+}
+
+/* ========== INFO CAJERO ========== */
+.info-cajero {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.cajero-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: #1976d2;
+}
+
+.cajero-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cajero-label {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.cajero-nombre {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* ========== ERROR MESSAGE ========== */
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #ffebee;
+  color: #c62828;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.error-message mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* ========== FORM ========== */
+.form-apertura {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* ========== LOADING ========== */
+.loading-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  color: #666;
+}
+
+/* ========== INFO BOX ========== */
+.info-box {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: #e3f2fd;
+  border-left: 4px solid #1976d2;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.info-box mat-icon {
+  color: #1976d2;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.info-text {
+  flex: 1;
+}
+
+.info-text p {
+  margin: 0 0 8px 0;
+  font-size: 0.875rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+.info-text p:last-child {
+  margin-bottom: 0;
+}
+
+.info-text strong {
+  color: #1976d2;
+}
+
+/* ========== ACTIONS ========== */
+.modal-actions {
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.button-spinner {
+  display: inline-block;
+  margin-right: 8px;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 600px) {
+  .modal-container {
+    max-width: 100%;
+  }
+
+  .modal-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .cajero-nombre {
+    font-size: 1rem;
+  }
+
+  .modal-content {
+    padding: 16px;
+  }
+}

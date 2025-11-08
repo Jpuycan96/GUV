@@ -1,0 +1,70 @@
+<div class="detalle-item">
+  <!-- Header del ítem -->
+  <div class="item-header">
+    <div class="numero-badge">{{ numero }}</div>
+    <div class="item-info">
+      <h4 class="servicio-nombre">
+        <mat-icon class="servicio-icon">design_services</mat-icon>
+        {{ detalle.nombreServicio }}
+      </h4>
+      <div class="item-specs">
+        <span class="spec-item">
+          <mat-icon>category</mat-icon>
+          {{ detalle.nombreMaterial }}
+        </span>
+        <span class="spec-item" *ngIf="detalle.nombreModelo">
+          <mat-icon>style</mat-icon>
+          {{ detalle.nombreModelo }}
+        </span>
+        <span class="spec-item">
+          <mat-icon>straighten</mat-icon>
+          {{ detalle.cantidad }} {{ detalle.unidadMedida }}
+        </span>
+        <span class="spec-item" *ngIf="detalle.ancho && detalle.alto">
+          <mat-icon>aspect_ratio</mat-icon>
+          {{ detalle.ancho }} x {{ detalle.alto }} cm
+        </span>
+      </div>
+    </div>
+    <div class="item-precio">
+      <span class="precio-label">Subtotal</span>
+      <span class="precio-value">S/ {{ detalle.subtotal | number:'1.2-2' }}</span>
+    </div>
+  </div>
+
+  <!-- Descripción si existe -->
+  <div class="item-description" *ngIf="detalle.descripcion">
+    <mat-icon>description</mat-icon>
+    <p>{{ detalle.descripcion }}</p>
+  </div>
+
+  <!-- Estado y progreso -->
+  <div class="item-footer" *ngIf="detalle.estadoActual">
+    <mat-chip [color]="getEstadoColor(detalle.estadoActual)">
+      {{ getEstadoLabel(detalle.estadoActual) }}
+    </mat-chip>
+    <div class="progress-info" *ngIf="detalle.progresoPorcentaje !== undefined">
+      <span>Progreso: {{ detalle.progresoPorcentaje }}%</span>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="detalle.progresoPorcentaje"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Información de diseño si existe -->
+  <div class="diseno-info" *ngIf="detalle.tipoDiseno">
+    <div class="diseno-header">
+      <mat-icon>brush</mat-icon>
+      <span>Diseño {{ detalle.tipoDiseno }}</span>
+    </div>
+    <div class="diseno-details" *ngIf="detalle.nombreDisenador">
+      <span><strong>Diseñador:</strong> {{ detalle.nombreDisenador }}</span>
+      <span *ngIf="detalle.duracionDisenoMinutos">
+        <strong>Duración:</strong> {{ detalle.duracionDisenoMinutos }} min
+      </span>
+    </div>
+    <p class="diseno-observaciones" *ngIf="detalle.observacionesDiseno">
+      {{ detalle.observacionesDiseno }}
+    </p>
+  </div>
+</div>

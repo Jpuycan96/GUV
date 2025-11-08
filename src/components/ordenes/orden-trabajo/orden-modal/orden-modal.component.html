@@ -1,0 +1,143 @@
+<div class="modal-container">
+  
+  <!-- Header -->
+  <div class="modal-header">
+    <div class="header-content">
+      <h2>
+        <mat-icon>receipt_long</mat-icon>
+        {{ orden?.numeroOrden || 'Cargando...' }}
+      </h2>
+      <mat-chip *ngIf="orden?.esCotizacion" class="chip-cotizacion">
+        COTIZACIÓN
+      </mat-chip>
+      <mat-chip *ngIf="orden?.estado" [class]="getEstadoClass(orden?.estado)">
+        {{ getEstadoLabel(orden?.estado) }}
+      </mat-chip>
+    </div>
+    <button mat-icon-button (click)="cerrar()" [disabled]="cargando">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="cargando" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Cargando información...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !cargando" class="alert alert-error">
+    <mat-icon>error</mat-icon>
+    <span>{{ error }}</span>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="orden && !cargando" class="modal-body">
+    
+    <!-- Información del Cliente -->
+    <div class="info-section">
+      <h3>
+        <mat-icon>person</mat-icon>
+        Cliente
+      </h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Nombre:</span>
+          <span class="value">{{ orden.nombreCliente }}</span>
+        </div>
+        <div class="info-item" *ngIf="orden.telefono">
+          <span class="label">Teléfono:</span>
+          <span class="value">{{ orden.telefono }}</span>
+        </div>
+        <div class="info-item" *ngIf="orden.email">
+          <span class="label">Email:</span>
+          <span class="value">{{ orden.email }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información General -->
+    <div class="info-section">
+      <h3>
+        <mat-icon>info</mat-icon>
+        Información General
+      </h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Vendedor:</span>
+          <span class="value">{{ orden.nombreVendedor }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Fecha:</span>
+          <span class="value">{{ orden.fRecepcion | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="info-item" *ngIf="orden.fEntregaAcordada">
+          <span class="label">Entrega:</span>
+          <span class="value">{{ orden.fEntregaAcordada | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen Financiero -->
+    <div class="financial-section">
+      <h3>
+        <mat-icon>attach_money</mat-icon>
+        Resumen Financiero
+      </h3>
+      <div class="financial-items">
+        <div class="financial-item">
+          <span class="label">Subtotal:</span>
+          <span class="value">S/ {{ orden.subtotal | number:'1.2-2' }}</span>
+        </div>
+        <div class="financial-item" *ngIf="orden.totalExtras">
+          <span class="label">Extras:</span>
+          <span class="value">S/ {{ orden.totalExtras | number:'1.2-2' }}</span>
+        </div>
+        <div class="financial-item" *ngIf="orden.descuento">
+          <span class="label">Descuento:</span>
+          <span class="value descuento">-S/ {{ orden.descuento | number:'1.2-2' }}</span>
+        </div>
+        <div class="financial-item total">
+          <span class="label">TOTAL:</span>
+          <span class="value">S/ {{ orden.totalFinal | number:'1.2-2' }}</span>
+        </div>
+        <div class="financial-item">
+          <span class="label">Pagado:</span>
+          <span class="value pagado">S/ {{ (orden.montoPagado || 0) | number:'1.2-2' }}</span>
+        </div>
+        <div class="financial-item saldo" [class.pendiente]="(orden.saldoPendiente || 0) > 0">
+          <span class="label">Saldo:</span>
+          <span class="value">S/ {{ (orden.saldoPendiente || 0) | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detalles -->
+    <div class="detalles-section" *ngIf="detalles.length > 0">
+      <h3>
+        <mat-icon>list</mat-icon>
+        Detalles ({{ detalles.length }})
+      </h3>
+      <div class="detalles-list">
+        <app-orden-detalle-item 
+          *ngFor="let detalle of detalles; let i = index"
+          [detalle]="detalle"
+          [numero]="i + 1">
+        </app-orden-detalle-item>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Actions -->
+  <div class="modal-actions" *ngIf="!cargando">
+    <button mat-button (click)="cerrar()">
+      Cerrar
+    </button>
+    <button mat-raised-button color="primary" (click)="verDetalle()">
+      <mat-icon>visibility</mat-icon>
+      Ver Detalle Completo
+    </button>
+    </div>
+
+</div>

@@ -1,0 +1,180 @@
+<div class="modal-container">
+  <!-- HEADER -->
+  <div class="modal-header">
+    <h2 mat-dialog-title>
+      <mat-icon class="header-icon">lock</mat-icon>
+      Cerrar Caja
+    </h2>
+    <button mat-icon-button (click)="cancelar()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- CONTENT -->
+  <mat-dialog-content class="modal-content">
+
+    <!-- INFO DE LA CAJA -->
+    <div class="caja-info">
+      <div class="info-row">
+        <span class="label">Turno:</span>
+        <span class="value">{{ caja.nombreTurno }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Cajero:</span>
+        <span class="value">{{ caja.nombreCajero }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Apertura:</span>
+        <span class="value">{{ caja.fApertura | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- RESUMEN DE TOTALES DEL SISTEMA -->
+    <div class="totales-sistema">
+      <h3>
+        <mat-icon>account_balance_wallet</mat-icon>
+        Totales del Sistema
+      </h3>
+
+      <div class="total-row total-principal">
+        <span class="label">Venta Total:</span>
+        <span class="value">S/ {{ (caja.ventaNeta || 0).toFixed(2) }}</span>
+      </div>
+
+      <div class="desglose">
+        <div class="total-row">
+          <span class="label">
+            <mat-icon class="small-icon">payments</mat-icon>
+            Efectivo:
+          </span>
+          <span class="value">S/ {{ (caja.totalEfectivo || 0).toFixed(2) }}</span>
+        </div>
+
+        <div class="total-row">
+          <span class="label">
+            <mat-icon class="small-icon">qr_code</mat-icon>
+            Yape:
+          </span>
+          <span class="value">S/ {{ (caja.totalYape || 0).toFixed(2) }}</span>
+        </div>
+
+        <div class="total-row">
+          <span class="label">
+            <mat-icon class="small-icon">qr_code_2</mat-icon>
+            Plin:
+          </span>
+          <span class="value">S/ {{ (caja.totalPlin || 0).toFixed(2) }}</span>
+        </div>
+
+        <div class="total-row">
+          <span class="label">
+            <mat-icon class="small-icon">account_balance</mat-icon>
+            Transferencia:
+          </span>
+          <span class="value">S/ {{ (caja.totalTransferencia || 0).toFixed(2) }}</span>
+        </div>
+
+        <div class="total-row subtotal">
+          <span class="label">Digital Total:</span>
+          <span class="value">S/ {{ getTotalDigital().toFixed(2) }}</span>
+        </div>
+      </div>
+
+      <div class="total-row pendiente" *ngIf="(caja.totalPendiente || 0) > 0">
+        <span class="label">
+          <mat-icon class="small-icon">schedule</mat-icon>
+          Pendiente:
+        </span>
+        <span class="value">S/ {{ (caja.totalPendiente || 0).toFixed(2) }}</span>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- ERROR MESSAGE -->
+    <div *ngIf="error" class="error-message">
+      <mat-icon>error</mat-icon>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- FORM DE ARQUEO -->
+    <form [formGroup]="form" class="form-cierre">
+      <h3>
+        <mat-icon>calculate</mat-icon>
+        Arqueo de Efectivo
+      </h3>
+
+      <!-- MONTO REAL -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Monto Real en Caja (Efectivo)</mat-label>
+        <mat-icon matPrefix>attach_money</mat-icon>
+        <input 
+          matInput 
+          type="number" 
+          step="0.01"
+          formControlName="montoReal"
+          [disabled]="guardando">
+        <span matSuffix>S/</span>
+        <mat-error *ngIf="form.get('montoReal')?.hasError('required')">
+          Debe ingresar el monto real
+        </mat-error>
+        <mat-error *ngIf="form.get('montoReal')?.hasError('min')">
+          El monto no puede ser negativo
+        </mat-error>
+      </mat-form-field>
+
+      <!-- DIFERENCIA -->
+      <div class="diferencia-box" [ngClass]="getDiferenciaClass()">
+        <div class="diferencia-header">
+          <mat-icon>{{ diferencia === 0 ? 'check_circle' : diferencia > 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+          <span class="diferencia-label">Diferencia:</span>
+        </div>
+        <div class="diferencia-valor">
+          <span class="monto">S/ {{ Math.abs(diferencia).toFixed(2) }}</span>
+          <span class="tipo" *ngIf="diferencia !== 0">
+            {{ diferencia > 0 ? 'SOBRANTE' : 'FALTANTE' }}
+          </span>
+          <span class="tipo" *ngIf="diferencia === 0">CUADRADO</span>
+        </div>
+      </div>
+
+      <!-- OBSERVACIONES -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Observaciones (opcional)</mat-label>
+        <mat-icon matPrefix>notes</mat-icon>
+        <textarea 
+          matInput 
+          formControlName="observaciones"
+          rows="3"
+          [disabled]="guardando"
+          placeholder="Agregar observaciones sobre el cierre de caja..."></textarea>
+      </mat-form-field>
+
+    </form>
+
+  </mat-dialog-content>
+
+  <!-- ACTIONS -->
+  <mat-dialog-actions class="modal-actions">
+    <button 
+      mat-button 
+      (click)="cancelar()"
+      [disabled]="guardando">
+      Cancelar
+    </button>
+    
+    <button 
+      mat-raised-button 
+      color="warn"
+      (click)="cerrarCaja()"
+      [disabled]="form.invalid || guardando">
+      <mat-spinner *ngIf="guardando" diameter="20" class="button-spinner"></mat-spinner>
+      <mat-icon *ngIf="!guardando">lock</mat-icon>
+      <span *ngIf="!guardando">Cerrar Caja</span>
+      <span *ngIf="guardando">Cerrando...</span>
+    </button>
+  </mat-dialog-actions>
+
+</div>

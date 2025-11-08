@@ -1,0 +1,121 @@
+<div class="modal-overlay" (click)="cancelar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>{{ editando ? 'Editar Turno' : 'Crear Nuevo Turno' }}</h2>
+      <button class="btn-close" (click)="cancelar()">×</button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- Mensaje de error -->
+      <div *ngIf="error" class="alert alert-error">
+        {{ error }}
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="cargando" class="loading">
+        <div class="spinner"></div>
+        <p>Procesando...</p>
+      </div>
+
+      <!-- Formulario -->
+      <form [formGroup]="turnoForm" (ngSubmit)="onSubmit()" *ngIf="!cargando">
+        
+        <!-- Campo Nombre -->
+        <div class="form-group">
+          <label for="nombre">Nombre del Turno *</label>
+          <input 
+            type="text" 
+            id="nombre"
+            formControlName="nombre"
+            class="form-control"
+            placeholder="Ej: Mañana, Tarde, Noche"
+            [class.is-invalid]="turnoForm.get('nombre')?.invalid && turnoForm.get('nombre')?.touched">
+          <div *ngIf="turnoForm.get('nombre')?.invalid && turnoForm.get('nombre')?.touched" class="error-message">
+            <span *ngIf="turnoForm.get('nombre')?.hasError('required')">El nombre es requerido</span>
+            <span *ngIf="turnoForm.get('nombre')?.hasError('minlength')">Mínimo 3 caracteres</span>
+            <span *ngIf="turnoForm.get('nombre')?.hasError('maxlength')">Máximo 50 caracteres</span>
+          </div>
+        </div>
+
+        <!-- Fila con horas -->
+        <div class="form-row">
+          <!-- Campo Hora Inicio -->
+          <div class="form-group">
+            <label for="horaInicio">Hora de Inicio *</label>
+            <input 
+              type="time" 
+              id="horaInicio"
+              formControlName="horaInicio"
+              class="form-control"
+              [class.is-invalid]="turnoForm.get('horaInicio')?.invalid && turnoForm.get('horaInicio')?.touched">
+            <div *ngIf="turnoForm.get('horaInicio')?.invalid && turnoForm.get('horaInicio')?.touched" class="error-message">
+              <span *ngIf="turnoForm.get('horaInicio')?.hasError('required')">La hora de inicio es requerida</span>
+            </div>
+          </div>
+
+          <!-- Campo Hora Fin -->
+          <div class="form-group">
+            <label for="horaFin">Hora de Fin *</label>
+            <input 
+              type="time" 
+              id="horaFin"
+              formControlName="horaFin"
+              class="form-control"
+              [class.is-invalid]="turnoForm.get('horaFin')?.invalid && turnoForm.get('horaFin')?.touched">
+            <div *ngIf="turnoForm.get('horaFin')?.invalid && turnoForm.get('horaFin')?.touched" class="error-message">
+              <span *ngIf="turnoForm.get('horaFin')?.hasError('required')">La hora de fin es requerida</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campo Monto Inicial -->
+        <div class="form-group">
+          <label for="montoInicialDefault">Monto Inicial por Defecto *</label>
+          <div class="input-group">
+            <span class="input-addon">S/</span>
+            <input 
+              type="number" 
+              id="montoInicialDefault"
+              formControlName="montoInicialDefault"
+              class="form-control"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+              [class.is-invalid]="turnoForm.get('montoInicialDefault')?.invalid && turnoForm.get('montoInicialDefault')?.touched">
+          </div>
+          <small class="form-hint">Monto con el que inicia la caja en este turno</small>
+          <div *ngIf="turnoForm.get('montoInicialDefault')?.invalid && turnoForm.get('montoInicialDefault')?.touched" class="error-message">
+            <span *ngIf="turnoForm.get('montoInicialDefault')?.hasError('required')">El monto es requerido</span>
+            <span *ngIf="turnoForm.get('montoInicialDefault')?.hasError('min')">El monto debe ser mayor o igual a 0</span>
+          </div>
+        </div>
+
+        <!-- Campo Activo -->
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox" 
+              formControlName="activo"
+              class="form-checkbox">
+            <span>Turno activo</span>
+          </label>
+          <small class="form-hint">Solo los turnos activos estarán disponibles para abrir cajas</small>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer" *ngIf="!cargando">
+      <button class="btn btn-secondary" (click)="cancelar()">
+        Cancelar
+      </button>
+      <button class="btn btn-primary" (click)="onSubmit()" 
+              [disabled]="turnoForm.invalid || cargando">
+        {{ editando ? 'Actualizar' : 'Crear' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,138 @@
+<div class="form-container">
+  
+  <!-- Header -->
+  <div class="form-header">
+    <h1>
+      <mat-icon>{{ editMode ? 'edit' : 'person_add' }}</mat-icon>
+      {{ editMode ? 'Editar Usuario' : 'Nuevo Usuario' }}
+    </h1>
+    <p class="subtitle">{{ editMode ? 'Modifica los datos del usuario' : 'Completa el formulario para crear un nuevo usuario' }}</p>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="cargando" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Cargando datos...</p>
+  </div>
+
+  <!-- Formulario -->
+  <mat-card *ngIf="!cargando" class="form-card">
+    
+    <!-- Error alert -->
+    <div *ngIf="error" class="alert alert-error">
+      <mat-icon>error</mat-icon>
+      <span>{{ error }}</span>
+    </div>
+
+    <form (ngSubmit)="guardar()">
+      
+      <!-- Datos básicos -->
+      <div class="form-section">
+        <h3>
+          <mat-icon>person</mat-icon>
+          Datos Básicos
+        </h3>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre Completo</mat-label>
+            <input matInput 
+                   [(ngModel)]="usuario.nombre" 
+                   name="nombre" 
+                   required
+                   maxlength="60"
+                   placeholder="Ej: Juan Pérez García">
+            <mat-icon matPrefix>badge</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Username</mat-label>
+            <input matInput 
+                   [(ngModel)]="usuario.username" 
+                   name="username" 
+                   required
+                   maxlength="50"
+                   [disabled]="editMode"
+                   placeholder="Ej: jperez">
+            <mat-icon matPrefix>account_circle</mat-icon>
+            <mat-hint *ngIf="editMode">El username no se puede modificar</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Contraseña</mat-label>
+            <input matInput 
+                   type="password"
+                   [(ngModel)]="usuario.password" 
+                   name="password" 
+                   [required]="!editMode"
+                   minlength="4"
+                   [placeholder]="editMode ? 'Dejar vacío para no cambiar' : 'Mínimo 4 caracteres'">
+            <mat-icon matPrefix>lock</mat-icon>
+            <mat-hint *ngIf="editMode">Solo completa si deseas cambiar la contraseña</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Roles -->
+      <div class="form-section">
+        <h3>
+          <mat-icon>admin_panel_settings</mat-icon>
+          Roles y Permisos
+        </h3>
+        
+        <p class="roles-help">Selecciona uno o más roles para el usuario</p>
+
+        <div class="roles-grid">
+          <mat-card 
+            *ngFor="let rol of rolesDisponibles" 
+            class="role-card"
+            [class.selected]="isRolSeleccionado(rol.nombre)"
+            (click)="toggleRol(rol.nombre)">
+            
+            <mat-checkbox 
+              [checked]="isRolSeleccionado(rol.nombre)"
+              (change)="toggleRol(rol.nombre)"
+              (click)="$event.stopPropagation()">
+            </mat-checkbox>
+
+            <div class="role-info">
+              <h4>{{ getRolLabel(rol) }}</h4>
+              <p>{{ getRolDescription(rol) }}</p>
+            </div>
+          </mat-card>
+        </div>
+
+        <div *ngIf="rolesSeleccionados.size === 0" class="no-roles-warning">
+          <mat-icon>info</mat-icon>
+          <span>No has seleccionado ningún rol. El usuario no tendrá permisos en el sistema.</span>
+        </div>
+      </div>
+
+      <!-- Acciones -->
+      <div class="form-actions">
+        <button mat-button 
+                type="button" 
+                (click)="cancelar()"
+                [disabled]="guardando">
+          <mat-icon>close</mat-icon>
+          Cancelar
+        </button>
+
+        <button mat-raised-button 
+                color="primary" 
+                type="submit"
+                [disabled]="guardando">
+          <mat-spinner *ngIf="guardando" diameter="20"></mat-spinner>
+          <mat-icon *ngIf="!guardando">{{ editMode ? 'save' : 'person_add' }}</mat-icon>
+          {{ guardando ? 'Guardando...' : (editMode ? 'Guardar Cambios' : 'Crear Usuario') }}
+        </button>
+      </div>
+
+    </form>
+  </mat-card>
+
+</div>

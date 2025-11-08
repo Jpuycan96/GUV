@@ -1,0 +1,45 @@
+<div class="dashboard-container">
+  <!-- Header del dashboard -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <button (click)="volver()" class="btn-back">← Volver</button>
+      <h1 *ngIf="servicio">{{ servicio.nombre }}</h1>
+      <p *ngIf="servicio && servicio.descripcion" class="header-description">
+        {{ servicio.descripcion }}
+      </p>
+    </div>
+    
+    <div *ngIf="servicio && servicio.imagenUrl" class="header-image">
+      <img [src]="servicio.imagenUrl" [alt]="servicio.nombre" class="servicio-img">
+    </div>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="error" class="alert alert-error">
+    {{ error }}
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="cargando" class="loading">
+    <div class="spinner"></div>
+    <p>Cargando servicio...</p>
+  </div>
+
+<!-- Contenido del dashboard -->
+<div *ngIf="!cargando && servicio" class="dashboard-content">
+  
+  <!-- Sección de Materiales -->
+  <app-materiales-section [idServicio]="servicioId"></app-materiales-section>
+
+  <!-- Sección de Precios -->
+  <app-precios-section [idServicio]="servicioId"></app-precios-section>
+
+  <!-- Sección de Extras -->
+  <app-extras-section [idServicio]="servicioId!"></app-extras-section>
+
+  <!-- ✅ Sección de Procesos (AHORA AL FINAL) -->
+  <app-procesos-section [idServicio]="servicioId!"></app-procesos-section>
+
+</div>
+
+</div>

@@ -1,0 +1,14 @@
+<div class="layout">
+  <!-- Sidebar -->
+  <app-sidebar [collapsed]="sidebarCollapsed"></app-sidebar>
+
+  <!-- Contenido principal -->
+  <main class="content" [class.expanded]="sidebarCollapsed">
+    <!-- Botón toggle para móvil/tablet -->
+    <button class="toggle-btn" (click)="toggleSidebar()">
+      <span class="hamburger-icon">☰</span>
+    </button>
+    
+    <router-outlet></router-outlet>
+  </main>
+</div>

@@ -1,0 +1,148 @@
+.modal-container {
+  width: 600px;
+  max-width: 90vw;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.modal-header mat-icon {
+  color: #1976d2;
+}
+
+.modal-body {
+  padding: 24px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Total Info */
+.total-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #e8f5e9;
+  border-radius: 8px;
+  border-left: 4px solid #43a047;
+  margin-bottom: 24px;
+}
+
+.total-info mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: #43a047;
+}
+
+.total-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.total-label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.total-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+/* Alert */
+.alert {
+  padding: 12px 16px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.alert-error {
+  background-color: #ffebee;
+  color: #c62828;
+  border-left: 4px solid #c62828;
+}
+
+/* Form */
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.factura-fields {
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+.factura-fields h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.factura-fields h3 mat-icon {
+  color: #1976d2;
+}
+
+/* Info Box */
+.info-box {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: #e3f2fd;
+  border-radius: 8px;
+  border-left: 4px solid #1976d2;
+  margin-top: 16px;
+}
+
+.info-box mat-icon {
+  color: #1976d2;
+  flex-shrink: 0;
+}
+
+.info-box p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+}
+
+mat-spinner {
+  display: inline-block;
+  margin-right: 8px;
+}

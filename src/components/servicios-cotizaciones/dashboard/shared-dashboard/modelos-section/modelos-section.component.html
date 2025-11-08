@@ -1,0 +1,69 @@
+<mat-card class="modelos-section">
+  <!-- Header -->
+  <mat-card-header>
+    <div class="header-left">
+      <mat-card-title>
+        <mat-icon class="section-icon">build</mat-icon>
+        Modelos
+      </mat-card-title>
+    </div>
+    <div class="header-right">
+      <button mat-icon-button (click)="recargar()" matTooltip="Recargar">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-raised-button color="primary" (click)="abrirModalCrear()" matTooltip="Agregar modelo">
+        <mat-icon>add</mat-icon>
+        Agregar
+      </button>
+    </div>
+  </mat-card-header>
+
+  <!-- Contenido -->
+  <mat-card-content>
+    <!-- Mensaje de error -->
+    <div *ngIf="error" class="alert alert-error">
+      <mat-icon>error</mat-icon>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="cargando" class="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando modelos...</p>
+    </div>
+
+    <!-- Lista de modelos -->
+    <div *ngIf="!cargando && modelos.length > 0" class="modelos-list">
+      <div *ngFor="let modelo of modelos" class="modelo-item">
+        <div class="modelo-info">
+          <h3>{{ modelo.codigo }}</h3>
+          <p *ngIf="modelo.descripcion" class="description">{{ modelo.descripcion }}</p>
+          <mat-chip [color]="obtenerEstado(modelo.activo).color" selected class="estado-chip">
+            {{ obtenerEstado(modelo.activo).texto }}
+          </mat-chip>
+        </div>
+
+        <div class="modelo-actions">
+          <button mat-icon-button (click)="abrirModalEditar(modelo)" 
+                  matTooltip="Editar" color="primary">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button (click)="eliminarModelo(modelo.idModelo)" 
+                  matTooltip="Eliminar" color="warn">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estado vacío -->
+    <div *ngIf="!cargando && modelos.length === 0" class="empty-state">
+      <mat-icon class="empty-icon">inbox</mat-icon>
+      <p>No hay modelos creados</p>
+      <button mat-raised-button color="primary" (click)="abrirModalCrear()">
+        <mat-icon>add</mat-icon>
+        Crear primer modelo
+      </button>
+    </div>
+  </mat-card-content>
+</mat-card>

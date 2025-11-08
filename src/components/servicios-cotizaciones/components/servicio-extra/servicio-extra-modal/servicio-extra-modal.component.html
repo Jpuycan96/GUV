@@ -1,0 +1,65 @@
+<div class="modal-overlay" (click)="cancelar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>Agregar Extra al Servicio</h2>
+      <button class="btn-close" (click)="cancelar()">×</button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- Mensaje de error -->
+      <div *ngIf="error" class="alert alert-error">
+        {{ error }}
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="cargando" class="loading">
+        <div class="spinner"></div>
+        <p>Procesando...</p>
+      </div>
+
+      <!-- Formulario -->
+      <form [formGroup]="servicioExtraForm" (ngSubmit)="onSubmit()" *ngIf="!cargando">
+        
+        <!-- Campo Extra -->
+        <div class="form-group">
+          <label for="idExtra">Seleccionar Extra *</label>
+          <select 
+            id="idExtra"
+            formControlName="idExtra"
+            class="form-control"
+            [class.is-invalid]="servicioExtraForm.get('idExtra')?.invalid && servicioExtraForm.get('idExtra')?.touched">
+            <option value="">-- Selecciona un extra --</option>
+            <option *ngFor="let extra of extras" [value]="extra.idExtra">
+              {{ extra.nombre }} {{ extra.tipo ? '(' + extra.tipo + ')' : '' }}
+            </option>
+          </select>
+          <div *ngIf="servicioExtraForm.get('idExtra')?.invalid && servicioExtraForm.get('idExtra')?.touched" class="error-message">
+            <span *ngIf="servicioExtraForm.get('idExtra')?.hasError('required')">Debe seleccionar un extra</span>
+          </div>
+        </div>
+
+        <!-- Botón para crear nuevo extra -->
+        <div class="crear-extra-container">
+          <p class="hint-text">¿No encuentras el extra que buscas?</p>
+          <button type="button" class="btn btn-secondary" (click)="abrirModalCrearExtra()">
+            + Crear Nuevo Extra
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer" *ngIf="!cargando">
+      <button class="btn btn-secondary" (click)="cancelar()">
+        Cancelar
+      </button>
+      <button class="btn btn-primary" (click)="onSubmit()" 
+              [disabled]="servicioExtraForm.invalid || cargando">
+        Agregar
+      </button>
+    </div>
+  </div>
+</div>

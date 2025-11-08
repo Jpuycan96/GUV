@@ -1,0 +1,120 @@
+<div class="modal-overlay" (click)="cancelar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>{{ editando ? 'Editar Servicio' : 'Crear Nuevo Servicio' }}</h2>
+      <button class="btn-close" (click)="cancelar()">×</button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- Mensaje de error -->
+      <div *ngIf="error" class="alert alert-error">
+        {{ error }}
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="cargando" class="loading">
+        <div class="spinner"></div>
+        <p>{{ archivoSeleccionado ? 'Subiendo imagen a Cloudinary...' : 'Procesando...' }}</p>
+      </div>
+
+      <!-- Formulario -->
+      <form [formGroup]="servicioForm" (ngSubmit)="onSubmit()" *ngIf="!cargando">
+        
+        <!-- Campo Nombre -->
+        <div class="form-group">
+          <label for="nombre">Nombre del Servicio *</label>
+          <input 
+            type="text" 
+            id="nombre"
+            formControlName="nombre"
+            class="form-control"
+            placeholder="Ej: Impresión Digital"
+            [class.is-invalid]="servicioForm.get('nombre')?.invalid && servicioForm.get('nombre')?.touched">
+          <div *ngIf="servicioForm.get('nombre')?.invalid && servicioForm.get('nombre')?.touched" class="error-message">
+            <span *ngIf="servicioForm.get('nombre')?.hasError('required')">El nombre es requerido</span>
+            <span *ngIf="servicioForm.get('nombre')?.hasError('minlength')">Mínimo 3 caracteres</span>
+            <span *ngIf="servicioForm.get('nombre')?.hasError('maxlength')">Máximo 100 caracteres</span>
+          </div>
+        </div>
+
+        <!-- Campo Descripción -->
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <textarea 
+            id="descripcion"
+            formControlName="descripcion"
+            class="form-control"
+            rows="4"
+            placeholder="Describe el servicio en detalle"
+            [class.is-invalid]="servicioForm.get('descripcion')?.invalid && servicioForm.get('descripcion')?.touched">
+          </textarea>
+          <div *ngIf="servicioForm.get('descripcion')?.invalid && servicioForm.get('descripcion')?.touched" class="error-message">
+            <span *ngIf="servicioForm.get('descripcion')?.hasError('maxlength')">Máximo 500 caracteres</span>
+          </div>
+        </div>
+
+        <!-- ✨ NUEVO: Campo de Imagen -->
+        <div class="form-group">
+          <label for="imagen">Imagen del Servicio</label>
+          
+          <!-- Input file oculto -->
+          <input 
+            type="file" 
+            id="imagen"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            style="display: none;">
+          
+          <!-- Botón para seleccionar archivo -->
+          <div class="file-input-wrapper">
+           <button 
+            type="button" 
+            class="btn btn-outline"
+            (click)="abrirSelectorArchivo()">
+              📁 {{ archivoSeleccionado ? 'Cambiar imagen' : 'Seleccionar imagen' }}
+            </button>
+            <span class="file-name" *ngIf="archivoSeleccionado">
+              {{ archivoSeleccionado.name }}
+            </span>
+          </div>
+          
+          <small class="form-hint">Formatos aceptados: JPG, PNG, GIF (máximo 5MB)</small>
+
+          <!-- Preview de imagen -->
+          <div *ngIf="imagenPreview" class="image-preview-container">
+            <div class="image-preview-header">
+              <p>Vista previa:</p>
+              <button 
+                type="button" 
+                class="btn-remove-image"
+                (click)="eliminarImagen()"
+                title="Eliminar imagen">
+                ✕
+              </button>
+            </div>
+            <div class="image-preview">
+              <img 
+                [src]="imagenPreview" 
+                alt="Preview" 
+                class="preview-img">
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer" *ngIf="!cargando">
+      <button class="btn btn-secondary" (click)="cancelar()">
+        Cancelar
+      </button>
+      <button class="btn btn-primary" (click)="onSubmit()" 
+              [disabled]="servicioForm.invalid || cargando">
+        {{ editando ? '💾 Actualizar' : '✨ Crear' }}
+      </button>
+    </div>
+  </div>
+</div>

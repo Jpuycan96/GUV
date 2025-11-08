@@ -1,0 +1,76 @@
+<div class="modal-overlay" (click)="cancelar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>{{ editando ? 'Editar Extra' : 'Crear Nuevo Extra' }}</h2>
+      <button class="btn-close" (click)="cancelar()">×</button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- Mensaje de error -->
+      <div *ngIf="error" class="alert alert-error">
+        {{ error }}
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="cargando" class="loading">
+        <div class="spinner"></div>
+        <p>Procesando...</p>
+      </div>
+
+      <!-- Formulario -->
+      <form [formGroup]="extraForm" (ngSubmit)="onSubmit()" *ngIf="!cargando">
+        
+        <!-- Campo Nombre -->
+        <div class="form-group">
+          <label for="nombre">Nombre del Extra *</label>
+          <input 
+            type="text" 
+            id="nombre"
+            formControlName="nombre"
+            class="form-control"
+            placeholder="Ej: Laminado Mate"
+            [class.is-invalid]="extraForm.get('nombre')?.invalid && extraForm.get('nombre')?.touched">
+          <div *ngIf="extraForm.get('nombre')?.invalid && extraForm.get('nombre')?.touched" class="error-message">
+            <span *ngIf="extraForm.get('nombre')?.hasError('required')">El nombre es requerido</span>
+            <span *ngIf="extraForm.get('nombre')?.hasError('minlength')">Mínimo 3 caracteres</span>
+            <span *ngIf="extraForm.get('nombre')?.hasError('maxlength')">Máximo 100 caracteres</span>
+          </div>
+        </div>
+
+        <!-- Campo Tipo -->
+        <div class="form-group">
+          <label for="tipo">Tipo de Extra *</label>
+          <select 
+            id="tipo"
+            formControlName="tipo"
+            class="form-control">
+            <option *ngFor="let tipo of tiposExtra" [value]="tipo">
+              {{ tipo }}
+            </option>
+          </select>
+          <small class="form-hint">Categoría del servicio extra</small>
+        </div>
+
+        <!-- Info adicional -->
+        <div class="info-box">
+          <strong>ℹ️ Nota:</strong>
+          <p>Este extra quedará disponible en el catálogo general y podrá ser agregado a cualquier servicio.</p>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer" *ngIf="!cargando">
+      <button class="btn btn-secondary" (click)="cancelar()">
+        Cancelar
+      </button>
+      <button class="btn btn-primary" (click)="onSubmit()" 
+              [disabled]="extraForm.invalid || cargando">
+        {{ editando ? 'Actualizar' : 'Crear' }}
+      </button>
+    </div>
+  </div>
+</div>

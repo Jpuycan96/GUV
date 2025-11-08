@@ -1,0 +1,139 @@
+<div class="form-container">
+  
+  <!-- Header -->
+  <div class="form-header">
+    <h1>
+      <mat-icon>{{ editMode ? 'edit' : 'person_add' }}</mat-icon>
+      {{ editMode ? 'Editar Cliente' : 'Nuevo Cliente' }}
+    </h1>
+    <p class="subtitle">{{ editMode ? 'Modifica los datos del cliente' : 'Completa el formulario para crear un nuevo cliente' }}</p>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="cargando" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Cargando datos...</p>
+  </div>
+
+  <!-- Formulario -->
+  <mat-card *ngIf="!cargando" class="form-card">
+    
+    <!-- Error alert -->
+    <div *ngIf="error" class="alert alert-error">
+      <mat-icon>error</mat-icon>
+      <span>{{ error }}</span>
+    </div>
+
+    <form (ngSubmit)="guardar()">
+      
+      <!-- Datos básicos -->
+      <div class="form-section">
+        <h3>
+          <mat-icon>person</mat-icon>
+          Datos Básicos
+        </h3>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre Completo / Razón Social</mat-label>
+            <input matInput 
+                   [(ngModel)]="cliente.nombre" 
+                   name="nombre" 
+                   required
+                   maxlength="100"
+                   placeholder="Ej: Juan Pérez o Empresa SAC">
+            <mat-icon matPrefix>badge</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row two-columns">
+          <mat-form-field appearance="outline">
+            <mat-label>Teléfono</mat-label>
+            <input matInput 
+                   [(ngModel)]="cliente.telefono" 
+                   name="telefono"
+                   maxlength="20"
+                   placeholder="Ej: 987654321">
+            <mat-icon matPrefix>phone</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput 
+                   type="email"
+                   [(ngModel)]="cliente.email" 
+                   name="email"
+                   maxlength="100"
+                   placeholder="Ej: cliente@ejemplo.com">
+            <mat-icon matPrefix>email</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Dirección</mat-label>
+            <input matInput 
+                   [(ngModel)]="cliente.direccion" 
+                   name="direccion"
+                   maxlength="200"
+                   placeholder="Ej: Av. Principal 123, Lima">
+            <mat-icon matPrefix>location_on</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Datos fiscales -->
+      <div class="form-section">
+        <h3>
+          <mat-icon>description</mat-icon>
+          Datos Fiscales (Opcional)
+        </h3>
+        
+        <div class="form-row two-columns">
+          <mat-form-field appearance="outline">
+            <mat-label>RUC</mat-label>
+            <input matInput 
+                   [(ngModel)]="cliente.ruc" 
+                   name="ruc"
+                   maxlength="11"
+                   placeholder="Ej: 20123456789">
+            <mat-icon matPrefix>credit_card</mat-icon>
+            <mat-hint>Solo números, máximo 11 dígitos</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Razón Social</mat-label>
+            <input matInput 
+                   [(ngModel)]="cliente.razonSocial" 
+                   name="razonSocial"
+                   maxlength="200"
+                   placeholder="Ej: Empresa Ejemplo SAC">
+            <mat-icon matPrefix>business</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Acciones -->
+      <div class="form-actions">
+        <button mat-button 
+                type="button" 
+                (click)="cancelar()"
+                [disabled]="guardando">
+          <mat-icon>close</mat-icon>
+          Cancelar
+        </button>
+
+        <button mat-raised-button 
+                color="primary" 
+                type="submit"
+                [disabled]="guardando">
+          <mat-spinner *ngIf="guardando" diameter="20"></mat-spinner>
+          <mat-icon *ngIf="!guardando">{{ editMode ? 'save' : 'person_add' }}</mat-icon>
+          {{ guardando ? 'Guardando...' : (editMode ? 'Guardar Cambios' : 'Crear Cliente') }}
+        </button>
+      </div>
+
+    </form>
+  </mat-card>
+
+</div>

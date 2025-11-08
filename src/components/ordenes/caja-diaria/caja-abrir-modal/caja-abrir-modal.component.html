@@ -1,0 +1,88 @@
+<div class="modal-container">
+  <!-- HEADER -->
+  <div class="modal-header">
+    <h2 mat-dialog-title>
+      <mat-icon class="header-icon">lock_open</mat-icon>
+      Abrir Caja
+    </h2>
+    <button mat-icon-button (click)="cancelar()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- CONTENT -->
+  <mat-dialog-content class="modal-content">
+    
+    <!-- INFO DEL CAJERO -->
+    <div class="info-cajero">
+      <mat-icon class="cajero-icon">person</mat-icon>
+      <div class="cajero-info">
+        <span class="cajero-label">Cajero:</span>
+        <span class="cajero-nombre">{{ nombreCajero }}</span>
+      </div>
+    </div>
+
+    <!-- ERROR MESSAGE -->
+    <div *ngIf="error" class="error-message">
+      <mat-icon>error</mat-icon>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- FORM -->
+    <form [formGroup]="form" class="form-apertura">
+      
+      <!-- SELECCIONAR TURNO -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Turno</mat-label>
+        <mat-icon matPrefix>schedule</mat-icon>
+        <mat-select formControlName="idTurno" [disabled]="cargandoTurnos || guardando">
+          <mat-option *ngFor="let turno of turnos" [value]="turno.idTurno">
+            {{ getTurnoNombre(turno) }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('idTurno')?.hasError('required')">
+          Debe seleccionar un turno
+        </mat-error>
+      </mat-form-field>
+
+      <!-- LOADING TURNOS -->
+      <div *ngIf="cargandoTurnos" class="loading-container">
+        <mat-spinner diameter="30"></mat-spinner>
+        <span>Cargando turnos...</span>
+      </div>
+
+      <!-- INFO ADICIONAL -->
+      <div class="info-box">
+        <mat-icon>info</mat-icon>
+        <div class="info-text">
+          <p><strong>Nota:</strong> Al abrir la caja se iniciará el registro de ventas para este turno.</p>
+          <p>La fecha y hora de apertura se registrarán automáticamente.</p>
+        </div>
+      </div>
+
+    </form>
+
+  </mat-dialog-content>
+
+  <!-- ACTIONS -->
+  <mat-dialog-actions class="modal-actions">
+    <button 
+      mat-button 
+      (click)="cancelar()"
+      [disabled]="guardando">
+      Cancelar
+    </button>
+    
+    <button 
+      mat-raised-button 
+      color="primary"
+      (click)="abrirCaja()"
+      [disabled]="form.invalid || guardando || cargandoTurnos">
+      <mat-spinner *ngIf="guardando" diameter="20" class="button-spinner"></mat-spinner>
+      <mat-icon *ngIf="!guardando">lock_open</mat-icon>
+      <span *ngIf="!guardando">Abrir Caja</span>
+      <span *ngIf="guardando">Abriendo...</span>
+    </button>
+  </mat-dialog-actions>
+
+</div>

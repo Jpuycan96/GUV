@@ -1,0 +1,180 @@
+<mat-accordion>
+  <mat-expansion-panel [expanded]="false" class="procesos-section">
+    <!-- Header del panel -->
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        <mat-icon class="section-icon">account_tree</mat-icon>
+        <strong>Procesos de Producción</strong>
+      </mat-panel-title>
+      <mat-panel-description>
+        {{ procesoServicio.length }} proceso(s) asignado(s)
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <!-- Contenido del panel (SE DESPLIEGA AL HACER CLIC) -->
+    <div class="panel-content">
+      <!-- Botones de acción -->
+      <div class="actions-header">
+        <button mat-icon-button (click)="recargar()" matTooltip="Recargar">
+          <mat-icon>refresh</mat-icon>
+        </button>
+        <button mat-raised-button color="accent" (click)="abrirModalCrearProceso()" 
+                matTooltip="Crear nuevo proceso">
+          <mat-icon>add_circle</mat-icon>
+          Nuevo Proceso
+        </button>
+      </div>
+
+      <!-- Mensaje de error -->
+      <div *ngIf="error" class="alert alert-error">
+        <mat-icon>error</mat-icon>
+        <span>{{ error }}</span>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="cargando" class="loading">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Cargando procesos...</p>
+      </div>
+
+      <!-- Selector de procesos disponibles -->
+      <div *ngIf="!cargando && getProcesosNoAsignados().length > 0" class="selector-procesos">
+        <h3>
+          <mat-icon>playlist_add</mat-icon>
+          Agregar Proceso Existente
+        </h3>
+        <div class="procesos-disponibles">
+          <button 
+            *ngFor="let proceso of getProcesosNoAsignados()"
+            mat-stroked-button 
+            (click)="agregarProcesoAlServicio(proceso.idProceso!)"
+            class="proceso-disponible">
+            <mat-icon>add</mat-icon>
+            {{ proceso.nombre }}
+          </button>
+        </div>
+        <mat-divider></mat-divider>
+      </div>
+
+      <!-- Lista de procesos del servicio -->
+      <div *ngIf="!cargando && procesoServicio.length > 0" class="procesos-lista">
+        <div class="lista-header">
+          <h3>
+            <mat-icon>list</mat-icon>
+            Procesos Asignados ({{ procesoServicio.length }})
+          </h3>
+          <div class="orden-actions">
+            <button 
+              *ngIf="!editandoOrden"
+              mat-button 
+              color="primary"
+              (click)="editandoOrden = true">
+              <mat-icon>swap_vert</mat-icon>
+              Reordenar
+            </button>
+            <button 
+              *ngIf="editandoOrden"
+              mat-raised-button 
+              color="primary"
+              (click)="guardarOrdenes()">
+              <mat-icon>save</mat-icon>
+              Guardar Orden
+            </button>
+            <button 
+              *ngIf="editandoOrden"
+              mat-button 
+              (click)="editandoOrden = false; cargarProcesos()">
+              Cancelar
+            </button>
+          </div>
+        </div>
+
+        <div class="proceso-item" *ngFor="let proceso of procesoServicio; let i = index">
+          <!-- Número de orden -->
+          <div class="proceso-orden">
+            <mat-chip [color]="editandoOrden ? 'accent' : 'primary'" selected>
+              {{ i + 1 }}
+            </mat-chip>
+          </div>
+
+          <!-- Info del proceso -->
+          <div class="proceso-info">
+            <div class="proceso-nombre">
+              <mat-icon>settings</mat-icon>
+              <strong>{{ proceso.nombreProceso }}</strong>
+              <mat-chip *ngIf="proceso.obligatorio" color="warn" selected class="chip-small">
+                Obligatorio
+              </mat-chip>
+              <mat-chip *ngIf="!proceso.obligatorio" class="chip-small">
+                Opcional
+              </mat-chip>
+            </div>
+            <div class="proceso-descripcion" *ngIf="proceso.descripcionProceso">
+              {{ proceso.descripcionProceso }}
+            </div>
+            <div class="proceso-tiempo" *ngIf="proceso.tiempoEstimadoMinutos">
+              <mat-icon class="small-icon">schedule</mat-icon>
+              Tiempo estimado: {{ proceso.tiempoEstimadoMinutos }} min
+            </div>
+          </div>
+
+          <!-- Controles de orden -->
+          <div *ngIf="editandoOrden" class="proceso-orden-controls">
+            <button mat-icon-button (click)="moverArriba(i)" [disabled]="i === 0">
+              <mat-icon>arrow_upward</mat-icon>
+            </button>
+            <button mat-icon-button (click)="moverAbajo(i)" 
+                    [disabled]="i === procesoServicio.length - 1">
+              <mat-icon>arrow_downward</mat-icon>
+            </button>
+          </div>
+
+          <!-- Acciones -->
+          <div class="proceso-actions" *ngIf="!editandoOrden">
+            <!-- Editar tiempo estimado -->
+            <button 
+              mat-icon-button 
+              matTooltip="Configurar tiempo estimado"
+              color="primary"
+              (click)="editarTiempoEstimado(proceso)">
+              <mat-icon>schedule</mat-icon>
+            </button>
+            
+            <!-- Toggle obligatorio -->
+            <button 
+              mat-icon-button 
+              [matTooltip]="proceso.obligatorio ? 'Marcar como opcional' : 'Marcar como obligatorio'"
+              (click)="proceso.obligatorio = !proceso.obligatorio; actualizarProceso(proceso)">
+              <mat-icon [color]="proceso.obligatorio ? 'warn' : 'primary'">
+                {{ proceso.obligatorio ? 'lock' : 'lock_open' }}
+              </mat-icon>
+            </button>
+            
+            <!-- Eliminar -->
+            <button 
+              mat-icon-button 
+              matTooltip="Eliminar" 
+              color="warn"
+              (click)="eliminarProceso(proceso.idServicioProceso)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado vacío -->
+      <div *ngIf="!cargando && procesoServicio.length === 0" class="empty-state">
+        <mat-icon class="empty-icon">inbox</mat-icon>
+        <p>No hay procesos asignados a este servicio</p>
+        <div class="empty-actions">
+          <button mat-raised-button color="primary" (click)="abrirModalCrearProceso()">
+            <mat-icon>add_circle</mat-icon>
+            Crear Proceso
+          </button>
+          <p class="or-text">o selecciona uno existente arriba</p>
+        </div>
+      </div>
+    </div>
+
+  </mat-expansion-panel>
+</mat-accordion>

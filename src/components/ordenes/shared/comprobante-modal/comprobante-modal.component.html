@@ -1,0 +1,121 @@
+<div class="modal-container">
+  <div class="modal-header">
+    <h2>
+      <mat-icon>receipt</mat-icon>
+      Emitir Comprobante
+    </h2>
+    <button mat-icon-button (click)="cerrar()" [disabled]="guardando">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <!-- Información del total -->
+    <div class="total-info">
+      <mat-icon>attach_money</mat-icon>
+      <div class="total-content">
+        <span class="total-label">Total a Facturar</span>
+        <span class="total-value">S/ {{ data.total | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error" class="alert alert-error">
+      <mat-icon>error</mat-icon>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- Formulario -->
+    <form [formGroup]="comprobanteForm" (ngSubmit)="emitirComprobante()">
+      
+      <!-- Tipo de Comprobante -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Tipo de Comprobante</mat-label>
+        <mat-select formControlName="tipoComprobante" (selectionChange)="onTipoComprobanteChange()">
+          <mat-option value="BOLETA">Boleta de Venta</mat-option>
+          <mat-option value="FACTURA">Factura Electrónica</mat-option>
+        </mat-select>
+        <mat-icon matPrefix>description</mat-icon>
+      </mat-form-field>
+
+      <!-- Serie -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Serie</mat-label>
+        <input matInput formControlName="serie" placeholder="B001 o F001">
+        <mat-icon matPrefix>tag</mat-icon>
+        <mat-error>La serie es requerida</mat-error>
+      </mat-form-field>
+
+      <!-- Campos solo para Factura -->
+      <div *ngIf="comprobanteForm.get('tipoComprobante')?.value === 'FACTURA'" class="factura-fields">
+        <h3>
+          <mat-icon>business</mat-icon>
+          Datos Fiscales
+        </h3>
+
+        <!-- RUC -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>RUC</mat-label>
+          <input matInput 
+                 formControlName="ruc" 
+                 placeholder="20123456789"
+                 maxlength="11">
+          <mat-icon matPrefix>badge</mat-icon>
+          <mat-error *ngIf="comprobanteForm.get('ruc')?.hasError('required')">
+            El RUC es requerido para facturas
+          </mat-error>
+          <mat-error *ngIf="comprobanteForm.get('ruc')?.hasError('pattern')">
+            El RUC debe tener 11 dígitos
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Razón Social -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Razón Social</mat-label>
+          <input matInput formControlName="razonSocialFiscal" placeholder="Nombre completo de la empresa">
+          <mat-icon matPrefix>business</mat-icon>
+          <mat-error>La razón social es requerida</mat-error>
+        </mat-form-field>
+
+        <!-- Dirección Fiscal -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Dirección Fiscal</mat-label>
+          <textarea matInput 
+                    formControlName="direccionFiscal"
+                    rows="2"
+                    placeholder="Dirección completa"></textarea>
+          <mat-icon matPrefix>location_on</mat-icon>
+          <mat-error>La dirección fiscal es requerida</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Información adicional -->
+      <div class="info-box">
+        <mat-icon>info</mat-icon>
+        <div>
+          <p *ngIf="comprobanteForm.get('tipoComprobante')?.value === 'BOLETA'">
+            <strong>Boleta de Venta:</strong> No requiere datos adicionales del cliente.
+          </p>
+          <p *ngIf="comprobanteForm.get('tipoComprobante')?.value === 'FACTURA'">
+            <strong>Factura Electrónica:</strong> Todos los campos son obligatorios. 
+            El comprobante será enviado a SUNAT automáticamente.
+          </p>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <div class="modal-actions">
+    <button mat-button (click)="cerrar()" [disabled]="guardando">
+      Cancelar
+    </button>
+    <button mat-raised-button 
+            color="primary" 
+            (click)="emitirComprobante()"
+            [disabled]="comprobanteForm.invalid || guardando">
+      <mat-spinner *ngIf="guardando" diameter="20"></mat-spinner>
+      <span *ngIf="!guardando">Emitir Comprobante</span>
+    </button>
+  </div>
+</div>

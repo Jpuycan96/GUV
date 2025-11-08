@@ -1,0 +1,102 @@
+<div class="modal-overlay" (click)="cancelar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>{{ editando ? 'Editar Precio por Área' : 'Crear Precio por Área' }}</h2>
+      <button class="btn-close" (click)="cancelar()">×</button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- Mensaje de error -->
+      <div *ngIf="error" class="alert alert-error">
+        {{ error }}
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="cargando" class="loading">
+        <div class="spinner"></div>
+        <p>Procesando...</p>
+      </div>
+
+      <!-- Formulario -->
+      <form [formGroup]="precioForm" (ngSubmit)="onSubmit()" *ngIf="!cargando">
+        
+        <!-- Campo Material -->
+        <div class="form-group">
+          <label for="idMaterial">Material *</label>
+          <select 
+            id="idMaterial"
+            formControlName="idMaterial"
+            class="form-control"
+            [class.is-invalid]="precioForm.get('idMaterial')?.invalid && precioForm.get('idMaterial')?.touched">
+            <option value="">-- Selecciona un material --</option>
+            <option *ngFor="let material of materiales" [value]="material.idMaterial">
+              {{ material.nombre }}
+            </option>
+          </select>
+          <div *ngIf="precioForm.get('idMaterial')?.invalid && precioForm.get('idMaterial')?.touched" class="error-message">
+            <span *ngIf="precioForm.get('idMaterial')?.hasError('required')">Debe seleccionar un material</span>
+          </div>
+        </div>
+
+        <!-- Precio por M² -->
+        <div class="form-group">
+          <label for="precioM2">Precio por Metro Cuadrado *</label>
+          <div class="input-with-prefix">
+            <span class="input-prefix">$</span>
+            <input 
+              type="number" 
+              id="precioM2"
+              formControlName="precioM2"
+              class="form-control with-prefix"
+              placeholder="Ej: 15.00"
+              step="0.01"
+              min="0.01"
+              [class.is-invalid]="precioForm.get('precioM2')?.invalid && precioForm.get('precioM2')?.touched">
+          </div>
+          <div *ngIf="precioForm.get('precioM2')?.invalid && precioForm.get('precioM2')?.touched" class="error-message">
+            <span *ngIf="precioForm.get('precioM2')?.hasError('required')">Campo requerido</span>
+            <span *ngIf="precioForm.get('precioM2')?.hasError('min')">Debe ser mayor a 0</span>
+          </div>
+        </div>
+
+        <!-- Unidad de Medida -->
+        <div class="form-group">
+          <label for="unidadMedida">Unidad de Medida *</label>
+          <select 
+            id="unidadMedida"
+            formControlName="unidadMedida"
+            class="form-control">
+            <option value="m2">Metro cuadrado (m²)</option>
+            <option value="cm2">Centímetro cuadrado (cm²)</option>
+            <option value="in2">Pulgada cuadrada (in²)</option>
+          </select>
+        </div>
+
+        <!-- Preview del precio -->
+        <div *ngIf="precioForm.valid" class="precio-preview">
+          <strong>Vista previa:</strong>
+          <p>
+            ${{ precioForm.get('precioM2')?.value }} por {{ precioForm.get('unidadMedida')?.value }}
+          </p>
+          <small class="form-hint">
+            El precio se calculará multiplicando el área por este valor
+          </small>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer" *ngIf="!cargando">
+      <button class="btn btn-secondary" (click)="cancelar()">
+        Cancelar
+      </button>
+      <button class="btn btn-primary" (click)="onSubmit()" 
+              [disabled]="precioForm.invalid || cargando">
+        {{ editando ? 'Actualizar' : 'Crear' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,89 @@
+<div class="modal-overlay" (click)="cancelar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>{{ editando ? 'Editar Proceso' : 'Crear Nuevo Proceso' }}</h2>
+      <button class="btn-close" (click)="cancelar()">×</button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- Mensaje de error -->
+      <div *ngIf="error" class="alert alert-error">
+        {{ error }}
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="cargando" class="loading">
+        <div class="spinner"></div>
+        <p>Procesando...</p>
+      </div>
+
+      <!-- Formulario -->
+      <form [formGroup]="procesoForm" (ngSubmit)="onSubmit()" *ngIf="!cargando">
+        
+        <!-- Campo Nombre -->
+        <div class="form-group">
+          <label for="nombre">Nombre del Proceso *</label>
+          <input 
+            type="text" 
+            id="nombre"
+            formControlName="nombre"
+            class="form-control"
+            placeholder="Ej: Diseño Gráfico"
+            [class.is-invalid]="procesoForm.get('nombre')?.invalid && procesoForm.get('nombre')?.touched">
+          <div *ngIf="procesoForm.get('nombre')?.invalid && procesoForm.get('nombre')?.touched" class="error-message">
+            <span *ngIf="procesoForm.get('nombre')?.hasError('required')">El nombre es requerido</span>
+            <span *ngIf="procesoForm.get('nombre')?.hasError('minlength')">Mínimo 3 caracteres</span>
+            <span *ngIf="procesoForm.get('nombre')?.hasError('maxlength')">Máximo 100 caracteres</span>
+          </div>
+        </div>
+
+        <!-- Campo Descripción -->
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <textarea 
+            id="descripcion"
+            formControlName="descripcion"
+            class="form-control"
+            rows="3"
+            placeholder="Describe en qué consiste este proceso"
+            [class.is-invalid]="procesoForm.get('descripcion')?.invalid && procesoForm.get('descripcion')?.touched">
+          </textarea>
+          <div *ngIf="procesoForm.get('descripcion')?.invalid && procesoForm.get('descripcion')?.touched" class="error-message">
+            <span *ngIf="procesoForm.get('descripcion')?.hasError('maxlength')">Máximo 500 caracteres</span>
+          </div>
+        </div>
+
+        <!-- Campo Activo -->
+        <div class="form-group form-check">
+          <input 
+            type="checkbox" 
+            id="activo"
+            formControlName="activo"
+            class="form-check-input">
+          <label for="activo" class="form-check-label">Proceso activo</label>
+          <small class="form-hint">Solo los procesos activos estarán disponibles</small>
+        </div>
+
+        <!-- Info adicional -->
+        <div class="info-box">
+          <strong>ℹ️ Nota:</strong>
+          <p>Este proceso quedará disponible en el catálogo general y podrá ser asignado a cualquier servicio.</p>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer" *ngIf="!cargando">
+      <button class="btn btn-secondary" (click)="cancelar()">
+        Cancelar
+      </button>
+      <button class="btn btn-primary" (click)="onSubmit()" 
+              [disabled]="procesoForm.invalid || cargando">
+        {{ editando ? 'Actualizar' : 'Crear' }}
+      </button>
+    </div>
+  </div>
+</div>
