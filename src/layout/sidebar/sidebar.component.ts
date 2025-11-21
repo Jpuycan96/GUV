@@ -53,8 +53,21 @@ export class SidebarComponent {
     {
       label: 'Servicios',
       icon: 'settings',
-      route: '/servicios-cotizaciones/servicios',
-      requierePermiso: { modulo: 'servicios', accion: 'ver' }
+      requierePermiso: { modulo: 'servicios', accion: 'ver' },
+      children: [
+        {
+          label: 'Lista de Servicios',
+          icon: 'list',
+          route: '/servicios-cotizaciones/servicios',
+          requierePermiso: { modulo: 'servicios', accion: 'ver' }
+        },
+        {
+          label: 'Configurar Procesos',
+          icon: 'timeline',
+          route: '/servicios-cotizaciones/configuracion/servicio-procesos',
+          requierePermiso: { modulo: 'servicios', accion: 'ver' }
+        }
+      ]
     },
     {
       label: 'Clientes',
@@ -98,27 +111,30 @@ export class SidebarComponent {
           requierePermiso: { modulo: 'cajas', accion: 'ver' }
         }
       ]
+    },
+    // ========== TRACKING DE PRODUCCIÓN (SIMPLIFICADO) ==========
+    {
+      label: 'Tracking Producción',
+      icon: 'track_changes',
+      route: '/tracking',
+      requierePermiso: { modulo: 'ordenes', accion: 'ver' }
     }
   ];
 
   constructor() {
     this.authService.currentUser$.subscribe(u => {
       this.user = u;
-      // 🔍 DEBUG: Ver roles del usuario
       console.log('👤 Usuario actual:', u?.username);
       console.log('🎭 Roles:', u?.roles);
       console.log('✅ Puede ver órdenes?', this.permisos.tiene('ordenes', 'ver'));
     });
   }
 
-  // Verificar si un item debe mostrarse
   mostrarItem(item: MenuItem): boolean {
-    // Si no requiere permisos, siempre se muestra
     if (!item.requierePermiso) {
       return true;
     }
 
-    // Verificar permiso
     return this.permisos.tiene(
       item.requierePermiso.modulo as any,
       item.requierePermiso.accion as any

@@ -1,0 +1,74 @@
+<div class="modal-container">
+  <!-- Header -->
+  <div class="modal-header">
+    <h2 mat-dialog-title>
+      <mat-icon class="header-icon">check_circle</mat-icon>
+      Completar Proceso
+    </h2>
+    <button mat-icon-button (click)="onCancelar()" class="btn-close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Contenido -->
+  <mat-dialog-content>
+    <!-- Información de la tarea -->
+    <div class="tarea-info">
+      <div class="info-row">
+        <span class="label">Orden:</span>
+        <strong>{{ tarea.numeroOrden }}</strong>
+      </div>
+      
+      <div class="info-row">
+        <span class="label">Cliente:</span>
+        <span>{{ tarea.nombreCliente }}</span>
+      </div>
+      
+      <div class="info-row">
+        <span class="label">Servicio:</span>
+        <span>{{ tarea.nombreServicio }}</span>
+      </div>
+      
+      <div class="info-row proceso">
+        <span class="label">Proceso:</span>
+        <strong class="proceso-nombre">{{ tarea.nombreProceso }}</strong>
+      </div>
+    </div>
+
+    <!-- Formulario -->
+    <form [formGroup]="form" class="form-container">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Observaciones (opcional)</mat-label>
+        <textarea 
+          matInput 
+          formControlName="observaciones"
+          rows="4"
+          placeholder="Agregar notas sobre el trabajo realizado...">
+        </textarea>
+        <mat-icon matPrefix>note</mat-icon>
+        <mat-hint>Puedes agregar detalles sobre el proceso completado</mat-hint>
+      </mat-form-field>
+    </form>
+
+    <!-- Advertencia -->
+    <div class="advertencia">
+      <mat-icon>info</mat-icon>
+      <p>Al confirmar, este proceso se marcará como completado y el siguiente proceso será desbloqueado automáticamente.</p>
+    </div>
+  </mat-dialog-content>
+
+  <!-- Acciones -->
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancelar()">
+      Cancelar
+    </button>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="onConfirmar()"
+      class="btn-confirmar">
+      <mat-icon>check</mat-icon>
+      Confirmar Completado
+    </button>
+  </mat-dialog-actions>
+</div>

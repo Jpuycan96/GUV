@@ -1,0 +1,194 @@
+<div class="tracking-container">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>
+        <mat-icon class="title-icon">track_changes</mat-icon>
+        Tracking de Producción
+      </h1>
+      <p class="subtitle">Seguimiento de órdenes y procesos en tiempo real</p>
+    </div>
+    
+    <div class="header-actions">
+      <button mat-icon-button (click)="cargarOrdenes()" matTooltip="Recargar" class="reload-btn">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="cargando" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando órdenes...</p>
+  </div>
+
+  <!-- Lista de órdenes expandibles -->
+  <div *ngIf="!cargando && ordenes.length > 0" class="ordenes-accordion">
+    
+    <mat-accordion multi>
+      
+      <!-- ✅ CAMBIO: Agregar #ordenPanel template reference -->
+      <mat-expansion-panel 
+        #ordenPanel
+        *ngFor="let orden of ordenes" 
+        class="orden-panel">
+        
+        <!-- Header del panel (vista colapsada) -->
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <div class="orden-header">
+              <span class="numero-orden">{{ orden.numeroOrden }}</span>
+              <mat-chip [color]="getPrioridadColor(getPrioridadOrden(orden))" selected class="chip-prioridad">
+                {{ getPrioridadOrden(orden) }}
+              </mat-chip>
+            </div>
+          </mat-panel-title>
+          
+          <mat-panel-description>
+            <div class="orden-info">
+              <span class="cliente">
+                <mat-icon>person</mat-icon>
+                {{ orden.nombreCliente }}
+              </span>
+              <span class="fecha" *ngIf="orden.fEntregaAcordada">
+                <mat-icon>event</mat-icon>
+                {{ orden.fEntregaAcordada | date:'dd/MM/yyyy HH:mm' }}
+              </span>
+              <span class="total">S/ {{ orden.totalFinal | number:'1.2-2' }}</span>
+            </div>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <!-- Contenido expandido -->
+        <div class="orden-detalles">
+          
+          <!-- Información general de la orden -->
+          <div class="info-general">
+            <div class="info-item">
+              <mat-icon>calendar_today</mat-icon>
+              <span>Recepción: {{ orden.fRecepcion | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="info-item" *ngIf="orden.fEntregaAcordada">
+              <mat-icon>event</mat-icon>
+              <span>Entrega: {{ orden.fEntregaAcordada | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="info-item">
+              <mat-icon>account_balance_wallet</mat-icon>
+              <span>Saldo: S/ {{ orden.saldoPendiente | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <!-- Lista de servicios (detalles) -->
+          <div class="servicios-list">
+            
+            <mat-accordion multi>
+              
+              <mat-expansion-panel *ngFor="let detalle of orden.detalles" class="servicio-panel">
+                
+                <!-- Header del servicio -->
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <div class="servicio-header">
+                      <mat-icon class="servicio-icon">business_center</mat-icon>
+                      <span class="servicio-nombre">{{ detalle.nombreServicio }}</span>
+                    </div>
+                  </mat-panel-title>
+                  
+                  <mat-panel-description>
+                    <div class="servicio-info">
+                      <span class="material">{{ detalle.nombreMaterial }}</span>
+                      <span class="cantidad" *ngIf="detalle.nombreModelo">{{ detalle.nombreModelo }}</span>
+                      <span class="cantidad">{{ detalle.cantidad }} {{ detalle.unidadMedida }}</span>
+                    </div>
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+
+                <!-- Procesos del servicio -->
+                <div class="procesos-list">
+                  
+                  <!-- Descripción si existe -->
+                  <div class="descripcion" *ngIf="detalle.descripcion">
+                    <mat-icon>description</mat-icon>
+                    <span>{{ detalle.descripcion }}</span>
+                  </div>
+
+                  <!-- Sin procesos configurados -->
+                  <div *ngIf="detalle.procesos.length === 0" class="sin-procesos">
+                    <mat-icon>info</mat-icon>
+                    <span>No hay procesos configurados para este servicio</span>
+                  </div>
+
+                  <!-- Lista de procesos -->
+                  <div *ngFor="let proceso of detalle.procesos" class="proceso-item" [class]="getEstadoProcesoClass(proceso.estado)">
+                    
+                    <div class="proceso-content">
+                      
+                      <!-- Icono y nombre -->
+                      <div class="proceso-info">
+                        <mat-icon class="proceso-icono">{{ getEstadoProcesoIcon(proceso.estado) }}</mat-icon>
+                        <div class="proceso-detalles">
+                          <span class="proceso-nombre">{{ proceso.nombreProceso }}</span>
+                          <span class="proceso-orden">#{{ proceso.orden }}</span>
+                        </div>
+                      </div>
+
+                      <!-- Estado -->
+                      <div class="proceso-estado">
+                        <mat-chip [class]="getEstadoProcesoClass(proceso.estado)">
+                          {{ proceso.estado }}
+                        </mat-chip>
+                      </div>
+
+                      <!-- Botón completar -->
+                      <div class="proceso-accion">
+                        <button 
+                          mat-raised-button 
+                          color="primary"
+                          [disabled]="proceso.bloqueado || proceso.estado === 'COMPLETADO'"
+                          (click)="abrirModalCompletar(proceso, detalle, orden)"
+                          class="btn-completar">
+                          <mat-icon>check_circle</mat-icon>
+                          Completar
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Mensaje de bloqueo -->
+                    <div *ngIf="proceso.bloqueado" class="alerta-bloqueo">
+                      <mat-icon>lock</mat-icon>
+                      <span>{{ proceso.motivoBloqueo }}</span>
+                    </div>
+
+                    <!-- Observaciones si existen -->
+                    <div *ngIf="proceso.observaciones" class="proceso-observaciones">
+                      <mat-icon>comment</mat-icon>
+                      <span>{{ proceso.observaciones }}</span>
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </mat-expansion-panel>
+
+            </mat-accordion>
+
+          </div>
+
+        </div>
+
+      </mat-expansion-panel>
+
+    </mat-accordion>
+
+  </div>
+
+  <!-- Estado vacío -->
+  <div *ngIf="!cargando && ordenes.length === 0" class="empty-state">
+    <mat-icon class="empty-icon">track_changes</mat-icon>
+    <h2>No hay órdenes en producción</h2>
+    <p>Las órdenes activas aparecerán aquí para hacer seguimiento</p>
+  </div>
+
+</div>

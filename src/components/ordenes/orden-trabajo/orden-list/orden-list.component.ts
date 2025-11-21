@@ -371,4 +371,14 @@ export class OrdenListComponent implements OnInit {
   recargar(): void {
     this.cargarOrdenes();
   }
+  // Navegar al tracking de una orden específica
+  irATracking(idOrden: number | undefined, event: Event): void {
+    event.stopPropagation(); // Evitar que se active el click de la fila
+    
+    if (idOrden) {
+      this.router.navigate(['/tracking'], { 
+        queryParams: { orden: idOrden } 
+      });
+    }
+  }
 }

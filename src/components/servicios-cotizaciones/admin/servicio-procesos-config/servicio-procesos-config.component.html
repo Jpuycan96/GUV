@@ -1,0 +1,336 @@
+<div class="config-container">
+  
+  <!-- ========== HEADER ========== -->
+  <mat-card class="header-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>trending_up</mat-icon>
+        Configuración de Procesos por Servicio
+      </mat-card-title>
+      <mat-card-subtitle>
+        Define qué áreas debe pasar cada servicio y en qué orden
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-actions align="end">
+      <button mat-icon-button (click)="cargarServicios()" matTooltip="Recargar">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- ========== MENSAJES ========== -->
+  <div *ngIf="mensaje" class="mensaje" [ngClass]="'mensaje-' + mensaje.tipo">
+    <mat-icon>{{ mensaje.tipo === 'success' ? 'check_circle' : 'error' }}</mat-icon>
+    <span>{{ mensaje.texto }}</span>
+  </div>
+
+  <!-- ========== LOADING INICIAL ========== -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Cargando...</p>
+  </div>
+
+  <!-- ========== LAYOUT PRINCIPAL ========== -->
+  <div *ngIf="!loading" class="main-layout">
+    
+    <!-- ========== COLUMNA IZQUIERDA: LISTA DE SERVICIOS ========== -->
+    <mat-card class="servicios-card">
+      <mat-card-header>
+        <mat-card-title>Servicios</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="servicios-lista">
+          <button 
+            mat-stroked-button 
+            *ngFor="let servicio of servicios"
+            [class.selected]="servicioSeleccionado?.idServicio === servicio.idServicio"
+            (click)="seleccionarServicio(servicio)"
+            class="servicio-item">
+            <mat-icon>build</mat-icon>
+            {{ servicio.nombre }}
+          </button>
+          
+          <div *ngIf="servicios.length === 0" class="empty-state">
+            <mat-icon>info</mat-icon>
+            <p>No hay servicios disponibles</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- ========== COLUMNA DERECHA: CONFIGURACIÓN DE PROCESOS ========== -->
+    <div class="procesos-section">
+      
+      <!-- MENSAJE: SELECCIONA UN SERVICIO -->
+      <mat-card *ngIf="!servicioSeleccionado" class="info-card">
+        <mat-card-content>
+          <mat-icon>arrow_back</mat-icon>
+          <p>Selecciona un servicio para configurar sus procesos</p>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- CONFIGURACIÓN DEL SERVICIO SELECCIONADO -->
+      <div *ngIf="servicioSeleccionado">
+        
+        <!-- HEADER DEL SERVICIO CON SELECTOR DE MATERIAL -->
+        <mat-card class="servicio-header">
+          <mat-card-header>
+            <div class="header-content">
+              <div class="title-section">
+                <mat-card-title>{{ servicioSeleccionado.nombre }}</mat-card-title>
+                <mat-card-subtitle>{{ servicioSeleccionado.descripcion }}</mat-card-subtitle>
+              </div>
+              
+              <!-- SELECTOR DE MATERIAL (INTEGRADO EN EL HEADER) -->
+              <div *ngIf="materialesDelServicio.length > 0" class="material-selector-header">
+                <mat-form-field appearance="outline" class="material-select-compact">
+                  <mat-label>
+                    <mat-icon>category</mat-icon>
+                    Material
+                  </mat-label>
+                  <mat-select [value]="materialesDelServicio.length > 0 ? materialesDelServicio[0].idMaterial : null" (selectionChange)="cambiarMaterial($event.value)">
+                    <mat-option [value]="null">
+                      Todos los materiales
+                    </mat-option>
+                    <mat-divider></mat-divider>
+                    <mat-option *ngFor="let material of materialesDelServicio" [value]="material.idMaterial">
+                      {{ material.nombre }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+          </mat-card-header>
+        </mat-card>
+
+            <!-- ========== AGREGAR NUEVO PROCESO ========== -->
+            <mat-card class="agregar-proceso-card">
+            <mat-card-header>
+                <mat-card-title>
+                <mat-icon>add_circle</mat-icon>
+                Agregar Proceso
+                </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="agregar-proceso-form-simple">
+                
+                <!-- Selector de Proceso -->
+                <mat-form-field appearance="outline" class="proceso-select-full">
+                    <mat-label>Selecciona un proceso</mat-label>
+                    <mat-select [(ngModel)]="procesoAgregar">
+                    <mat-option [value]="0">-- Seleccionar --</mat-option>
+                    <mat-option 
+                        *ngFor="let proceso of getProcesosNoAsignados()" 
+                        [value]="proceso.idProceso">
+                        {{ proceso.nombre }}
+                    </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <!-- Fila de acciones -->
+                <div class="form-actions-row">
+                    <!-- Checkbox: Puede ir en paralelo -->
+                    <mat-checkbox 
+                    [(ngModel)]="puedeParaleloNuevoProceso"
+                    class="paralelo-checkbox">
+                    <mat-icon>flash_on</mat-icon>
+                    Puede ejecutarse en paralelo
+                    </mat-checkbox>
+
+                    <!-- Botón Agregar -->
+                    <button 
+                    mat-raised-button 
+                    color="primary" 
+                    (click)="agregarProceso()"
+                    [disabled]="procesoAgregar === 0"
+                    class="btn-agregar-grande">
+                    <mat-icon>add</mat-icon>
+                    Agregar Proceso
+                    </button>
+                </div>
+                </div>
+            </mat-card-content>
+            </mat-card>
+
+        <!-- ========== LISTA DE PROCESOS ASIGNADOS ========== -->
+        <mat-card class="procesos-asignados-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>list_alt</mat-icon>
+              Procesos Asignados
+              <mat-chip class="count-chip">{{ procesosAsignados.length }}</mat-chip>
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            
+            <!-- TABLA DE PROCESOS -->
+            <div *ngIf="procesosAsignados.length > 0" class="tabla-procesos">
+              <table mat-table [dataSource]="procesosAsignados" class="procesos-table">
+                
+                <!-- Columna: Orden -->
+                <ng-container matColumnDef="orden">
+                  <th mat-header-cell *matHeaderCellDef>Orden</th>
+                  <td mat-cell *matCellDef="let proceso">
+                    <mat-chip class="orden-chip">{{ proceso.orden }}</mat-chip>
+                  </td>
+                </ng-container>
+
+                <!-- Columna: Proceso -->
+                <ng-container matColumnDef="proceso">
+                  <th mat-header-cell *matHeaderCellDef>Proceso</th>
+                  <td mat-cell *matCellDef="let proceso">
+                    <div class="proceso-info">
+                      <strong>{{ proceso.nombreProceso }}</strong>
+                      <small *ngIf="proceso.descripcionProceso">{{ proceso.descripcionProceso }}</small>
+                      
+                      <!-- Badges -->
+                      <div class="proceso-badges">
+                        <mat-chip *ngIf="proceso.nombreMaterial" class="chip-material">
+                          <mat-icon>category</mat-icon>
+                          {{ proceso.nombreMaterial }}
+                        </mat-chip>
+                        <mat-chip *ngIf="proceso.puedeParalelo" class="chip-paralelo">
+                          <mat-icon>flash_on</mat-icon>
+                          Paralelo
+                        </mat-chip>
+                        <mat-chip *ngIf="!proceso.obligatorio" class="chip-opcional">
+                          Opcional
+                        </mat-chip>
+                      </div>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Columna: Tiempo -->
+                <ng-container matColumnDef="tiempo">
+                  <th mat-header-cell *matHeaderCellDef>Tiempo</th>
+                  <td mat-cell *matCellDef="let proceso">
+                    <span class="tiempo-badge">
+                      <mat-icon>schedule</mat-icon>
+                      {{ proceso.tiempoEstimadoMinutos || 0 }} min
+                    </span>
+                  </td>
+                </ng-container>
+
+                <!-- Columna: Acciones -->
+                <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let proceso; let i = index">
+                    <div class="acciones-buttons">
+                    <button 
+                        mat-icon-button 
+                        (click)="moverArriba(i)"
+                        [disabled]="i === 0"
+                        matTooltip="Subir">
+                        <mat-icon>arrow_upward</mat-icon>
+                    </button>
+                    <button 
+                        mat-icon-button 
+                        (click)="moverAbajo(i)"
+                        [disabled]="i === procesosAsignados.length - 1"
+                        matTooltip="Bajar">
+                        <mat-icon>arrow_downward</mat-icon>
+                    </button>
+                    <!-- ❌ BOTÓN EDITAR ELIMINADO -->
+                    <button 
+                        mat-icon-button 
+                        color="warn"
+                        (click)="eliminarProceso(proceso)"
+                        matTooltip="Eliminar">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                    </div>
+                </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['orden', 'proceso', 'tiempo', 'acciones']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['orden', 'proceso', 'tiempo', 'acciones']"></tr>
+              </table>
+            </div>
+
+            <!-- EMPTY STATE -->
+            <div *ngIf="procesosAsignados.length === 0" class="empty-state">
+              <mat-icon>inbox</mat-icon>
+              <p>No hay procesos asignados</p>
+              <small>Agrega el primer proceso desde el formulario de arriba</small>
+            </div>
+
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MODAL DE EDICIÓN ========== -->
+<div *ngIf="showEditModal" class="modal-overlay" (click)="cerrarModalEditar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>edit</mat-icon>
+          Editar Proceso
+        </mat-card-title>
+        <button mat-icon-button (click)="cerrarModalEditar()" class="close-button">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-card-header>
+      <mat-card-content *ngIf="procesoEditando">
+        <div class="edit-form">
+          
+          <!-- Nombre del proceso (solo lectura) -->
+          <mat-form-field appearance="outline">
+            <mat-label>Proceso</mat-label>
+            <input matInput [value]="procesoEditando.nombreProceso" readonly>
+          </mat-form-field>
+
+          <!-- Orden -->
+          <mat-form-field appearance="outline">
+            <mat-label>Orden</mat-label>
+            <input matInput type="number" [(ngModel)]="procesoEditando.orden">
+          </mat-form-field>
+
+          <!-- Tiempo estimado -->
+          <mat-form-field appearance="outline">
+            <mat-label>Tiempo estimado (minutos)</mat-label>
+            <input matInput type="number" [(ngModel)]="procesoEditando.tiempoEstimadoMinutos">
+          </mat-form-field>
+
+          <!-- Material -->
+          <mat-form-field *ngIf="materialesDelServicio.length > 0" appearance="outline">
+            <mat-label>Material</mat-label>
+            <mat-select [(ngModel)]="procesoEditando.idMaterial">
+              <mat-option [value]="null">Todos los materiales</mat-option>
+              <mat-option 
+                *ngFor="let material of materialesDelServicio" 
+                [value]="material.idMaterial">
+                {{ material.nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Obligatorio -->
+          <mat-checkbox [(ngModel)]="procesoEditando.obligatorio">
+            <mat-icon>check_circle</mat-icon>
+            Proceso obligatorio
+          </mat-checkbox>
+
+          <!-- Puede ir en paralelo -->
+          <mat-checkbox [(ngModel)]="procesoEditando.puedeParalelo">
+            <mat-icon>flash_on</mat-icon>
+            Puede ejecutarse en paralelo
+          </mat-checkbox>
+
+        </div>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-button (click)="cerrarModalEditar()">Cancelar</button>
+        <button mat-raised-button color="primary" (click)="guardarEdicion()">
+          <mat-icon>save</mat-icon>
+          Guardar Cambios
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

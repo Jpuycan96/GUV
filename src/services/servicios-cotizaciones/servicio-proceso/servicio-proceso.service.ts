@@ -12,6 +12,14 @@ export interface ServicioProcesoDTO {
   orden?: number;
   obligatorio?: boolean;
   tiempoEstimadoMinutos?: number;
+  
+  // ========== NUEVOS CAMPOS ==========
+  idMaterial?: number;  // NULL = aplica a todos los materiales
+  nombreMaterial?: string;
+  puedeParalelo?: boolean;
+  grupoParalelo?: number;
+  idDependenciaProceso?: number;
+  nombreDependenciaProceso?: string;
 }
 
 @Injectable({
@@ -24,6 +32,18 @@ export class ServicioProcesoService {
 
   obtenerPorServicio(idServicio: number): Observable<ServicioProcesoDTO[]> {
     return this.http.get<ServicioProcesoDTO[]>(`${this.apiUrl}/servicio/${idServicio}`);
+  }
+
+  // ========== NUEVOS MÉTODOS ==========
+  
+  // Obtener procesos filtrados por material
+  obtenerPorServicioYMaterial(idServicio: number, idMaterial: number): Observable<ServicioProcesoDTO[]> {
+    return this.http.get<ServicioProcesoDTO[]>(`${this.apiUrl}/servicio/${idServicio}/material/${idMaterial}`);
+  }
+  
+  // Obtener materiales que tienen procesos configurados
+  obtenerMaterialesConProcesos(idServicio: number): Observable<number[]> {
+    return this.http.get<number[]>(`${this.apiUrl}/servicio/${idServicio}/materiales`);
   }
 
   agregar(dto: ServicioProcesoDTO): Observable<ServicioProcesoDTO> {

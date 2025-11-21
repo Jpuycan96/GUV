@@ -1,0 +1,161 @@
+.modal-container {
+  padding: 0;
+  max-width: 600px;
+}
+
+/* Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  margin: -24px -24px 0 -24px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.3em;
+  font-weight: 500;
+}
+
+.header-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+.btn-close {
+  color: white;
+}
+
+/* Contenido */
+mat-dialog-content {
+  padding: 24px !important;
+  margin: 0;
+}
+
+/* Info de la tarea */
+.tarea-info {
+  background-color: #f5f7fa;
+  border-left: 4px solid #667eea;
+  padding: 16px;
+  border-radius: 4px;
+  margin-bottom: 24px;
+}
+
+.info-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 0.95em;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-row.proceso {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.label {
+  color: #666;
+  min-width: 80px;
+}
+
+.proceso-nombre {
+  color: #667eea;
+  font-size: 1.05em;
+}
+
+/* Formulario */
+.form-container {
+  margin-bottom: 20px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+mat-form-field {
+  margin-bottom: 0;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Advertencia */
+.advertencia {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background-color: #fff3e0;
+  border-left: 4px solid #ff9800;
+  border-radius: 4px;
+  margin-top: 16px;
+}
+
+.advertencia mat-icon {
+  color: #ff9800;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.advertencia p {
+  margin: 0;
+  font-size: 0.9em;
+  color: #e65100;
+  line-height: 1.4;
+}
+
+/* Acciones */
+mat-dialog-actions {
+  padding: 16px 24px !important;
+  margin: 0 -24px -24px -24px;
+  background-color: #fafafa;
+  border-top: 1px solid #e0e0e0;
+}
+
+.btn-confirmar {
+  min-width: 200px;
+}
+
+.btn-confirmar mat-icon {
+  margin-right: 8px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .modal-container {
+    max-width: 100%;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.1em;
+  }
+  
+  .info-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .label {
+    min-width: auto;
+    font-weight: 500;
+  }
+  
+  .btn-confirmar {
+    min-width: auto;
+    width: 100%;
+  }
+}

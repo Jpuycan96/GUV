@@ -553,3 +553,17 @@
     font-size: 0.85rem;
   }
 }
+/* ========== CHIP CLICKEABLE ========== */
+.chip-clickeable {
+  cursor: pointer !important;
+  transition: all 0.2s ease;
+}
+
+.chip-clickeable:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+}
+
+.chip-clickeable:active {
+  transform: scale(0.98);
+}

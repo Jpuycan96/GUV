@@ -1,0 +1,100 @@
+.tarea-card {
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.tarea-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.tarea-card.bloqueada {
+  opacity: 0.6;
+  background-color: #f5f5f5;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.numero-orden {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #1976d2;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.95em;
+}
+
+.info-row mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #666;
+}
+
+.cliente {
+  font-weight: 500;
+  color: #333;
+}
+
+.descripcion {
+  font-size: 0.85em;
+  color: #666;
+  font-style: italic;
+}
+
+.proceso {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+  font-size: 1em;
+}
+
+.orden-badge {
+  background-color: #e3f2fd;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  color: #1976d2;
+  margin-left: auto;
+}
+
+.alerta-bloqueo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background-color: #fff3e0;
+  border-left: 4px solid #ff9800;
+  border-radius: 4px;
+  margin-top: 12px;
+  font-size: 0.85em;
+  color: #e65100;
+}
+
+.alerta-bloqueo mat-icon {
+  color: #ff9800;
+}
+
+mat-card-actions {
+  padding: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-completar {
+  width: 100%;
+}
+
+.btn-completar mat-icon {
+  margin-right: 8px;
+}

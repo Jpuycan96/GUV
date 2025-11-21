@@ -1,0 +1,67 @@
+<mat-card class="tarea-card" [class.bloqueada]="tarea.bloqueado">
+  <!-- Header con número de orden y prioridad -->
+  <mat-card-header>
+    <mat-card-title>
+      <div class="header-content">
+        <span class="numero-orden">{{ tarea.numeroOrden }}</span>
+        <mat-chip [color]="getPrioridadColor()" selected>
+          <mat-icon>{{ getPrioridadIcon() }}</mat-icon>
+          {{ tarea.prioridad }}
+        </mat-chip>
+      </div>
+    </mat-card-title>
+  </mat-card-header>
+
+  <!-- Contenido -->
+  <mat-card-content>
+    <!-- Cliente -->
+    <div class="info-row">
+      <mat-icon>person</mat-icon>
+      <span class="cliente">{{ tarea.nombreCliente }}</span>
+    </div>
+
+    <!-- Servicio -->
+    <div class="info-row">
+      <mat-icon>business_center</mat-icon>
+      <span>{{ tarea.nombreServicio }}</span>
+    </div>
+
+    <!-- Descripción del servicio (si existe) -->
+    <div class="info-row descripcion" *ngIf="tarea.descripcionServicio">
+      <mat-icon>description</mat-icon>
+      <span>{{ tarea.descripcionServicio }}</span>
+    </div>
+
+    <!-- Fecha de entrega -->
+    <div class="info-row" *ngIf="tarea.fEntregaAcordada">
+      <mat-icon>event</mat-icon>
+      <span>{{ tarea.fEntregaAcordada | date: 'dd/MM/yyyy HH:mm' }}</span>
+    </div>
+
+    <!-- Proceso actual -->
+    <div class="info-row proceso">
+      <mat-icon>task_alt</mat-icon>
+      <strong>{{ tarea.nombreProceso }}</strong>
+      <span class="orden-badge">#{{ tarea.orden }}</span>
+    </div>
+
+    <!-- Mensaje de bloqueo -->
+    <div class="alerta-bloqueo" *ngIf="tarea.bloqueado">
+      <mat-icon>lock</mat-icon>
+      <span>{{ tarea.motivoBloqueo }}</span>
+    </div>
+  </mat-card-content>
+
+  <!-- Acciones -->
+  <mat-card-actions>
+    <button 
+      mat-raised-button 
+      color="primary"
+      [disabled]="tarea.bloqueado"
+      (click)="onCompletar()"
+      class="btn-completar">
+      <mat-icon>check_circle</mat-icon>
+      Completar
+    </button>
+  </mat-card-actions>
+</mat-card>

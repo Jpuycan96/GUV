@@ -1,0 +1,651 @@
+/* ========== CONTENEDOR PRINCIPAL ========== */
+.config-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ========== HEADER CARD (VERDE) ========== */
+.header-card {
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+  color: white;
+}
+
+.header-card mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px;
+  color: white;
+}
+
+.header-card mat-card-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 8px;
+}
+
+.header-card button {
+  color: white;
+}
+
+/* ========== MENSAJES ========== */
+.mensaje {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mensaje-success {
+  background-color: #d4edda;
+  color: #155724;
+  border-left: 4px solid #28a745;
+}
+
+.mensaje-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border-left: 4px solid #dc3545;
+}
+
+.mensaje-info {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border-left: 4px solid #17a2b8;
+}
+
+/* ========== LOADING ========== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  gap: 20px;
+}
+
+.loading-container p {
+  color: #666;
+  font-size: 16px;
+}
+
+/* ========== LAYOUT PRINCIPAL ========== */
+.main-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========== LISTA DE SERVICIOS (IZQUIERDA) ========== */
+.servicios-card {
+  position: sticky;
+  top: 20px;
+}
+
+.servicios-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 600px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.servicio-item {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 12px 16px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.servicio-item mat-icon {
+  margin-right: 12px;
+}
+
+.servicio-item:hover {
+  background-color: #f0f0f0;
+  transform: translateX(4px);
+}
+
+.servicio-item.selected {
+  background-color: #4caf50;
+  color: white;
+  font-weight: 600;
+}
+
+.servicio-item.selected mat-icon {
+  color: white;
+}
+
+/* ========== SECCIÓN DE PROCESOS (DERECHA) ========== */
+.procesos-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* INFO CARD (cuando no hay servicio seleccionado) */
+.info-card {
+  padding: 40px;
+  text-align: center;
+  background-color: #f8f9fa;
+}
+
+.info-card mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: #ccc;
+  margin-bottom: 16px;
+}
+
+.info-card p {
+  color: #666;
+  font-size: 16px;
+}
+
+/* ========== HEADER DEL SERVICIO (VERDE) ========== */
+.servicio-header {
+  background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+  color: white;
+}
+
+.servicio-header mat-card-title {
+  color: white;
+  font-size: 20px;
+}
+
+.servicio-header mat-card-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.servicio-header .header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.servicio-header .title-section {
+  flex: 1;
+  min-width: 250px;
+}
+
+.servicio-header .material-selector-header {
+  flex: 0 0 280px;
+}
+
+.servicio-header .material-select-compact {
+  margin: 0;
+}
+
+.servicio-header .material-select-compact ::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: white;
+  border-radius: 8px;
+}
+
+.servicio-header .material-select-compact ::ng-deep .mat-mdc-form-field-flex {
+  background-color: white;
+}
+
+.servicio-header .material-select-compact mat-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #333;
+}
+
+.servicio-header .material-select-compact mat-label mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+/* ========== AGREGAR PROCESO (VERDE CLARO) ========== */
+.agregar-proceso-card {
+  background-color: #e8f5e9;
+  border-left: 4px solid #4caf50;
+}
+
+.agregar-proceso-card mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #2e7d32;
+}
+
+.agregar-proceso-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-row-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.proceso-select,
+.material-select-small {
+  width: 100%;
+}
+
+.paralelo-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.paralelo-checkbox mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #ff9800;
+}
+
+.btn-agregar {
+  min-width: 180px;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-row-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .btn-agregar {
+    width: 100%;
+  }
+}
+
+/* ========== PROCESOS ASIGNADOS ========== */
+.procesos-asignados-card mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.count-chip {
+  background-color: #4caf50;
+  color: white;
+  font-weight: 600;
+}
+
+/* TABLA DE PROCESOS */
+.tabla-procesos {
+  overflow-x: auto;
+  margin-top: 16px;
+}
+
+.procesos-table {
+  width: 100%;
+  background-color: white;
+}
+
+.procesos-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+}
+
+.procesos-table td,
+.procesos-table th {
+  padding: 12px 16px;
+}
+
+.procesos-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Columna Orden */
+.orden-chip {
+  background-color: #4caf50;
+  color: white;
+  font-weight: 600;
+  min-width: 40px;
+  justify-content: center;
+}
+
+/* Columna Proceso */
+.proceso-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.proceso-info strong {
+  font-size: 15px;
+  color: #333;
+}
+
+.proceso-info small {
+  color: #666;
+  font-size: 13px;
+}
+
+.proceso-badges {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.chip-material {
+  background-color: #fff3e0;
+  color: #e65100;
+  font-size: 12px;
+}
+
+.chip-material mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+.chip-paralelo {
+  background-color: #e3f2fd;
+  color: #1565c0;
+  font-size: 12px;
+}
+
+.chip-paralelo mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+.chip-opcional {
+  background-color: #fff9c4;
+  color: #f57f17;
+  font-size: 12px;
+}
+
+/* Columna Tiempo */
+.tiempo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  background-color: #f0f0f0;
+  border-radius: 16px;
+  font-size: 13px;
+  color: #666;
+}
+
+.tiempo-badge mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Columna Acciones */
+.acciones-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.acciones-buttons button {
+  width: 36px;
+  height: 36px;
+}
+
+.acciones-buttons button mat-icon {
+  font-size: 20px;
+}
+
+.acciones-buttons button:disabled {
+  opacity: 0.3;
+}
+
+/* ========== EMPTY STATE ========== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #999;
+  text-align: center;
+}
+
+.empty-state mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  color: #ddd;
+}
+
+.empty-state p {
+  font-size: 16px;
+  margin: 8px 0;
+}
+
+.empty-state small {
+  font-size: 14px;
+  color: #bbb;
+}
+
+/* ========== MODAL DE EDICIÓN ========== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-content mat-card {
+  margin: 0;
+}
+
+.modal-content mat-card-header {
+  position: relative;
+}
+
+.modal-content mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.close-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+.edit-form mat-form-field {
+  width: 100%;
+}
+
+.edit-form mat-checkbox {
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.edit-form mat-checkbox mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* ========== SCROLLBAR PERSONALIZADO ========== */
+.servicios-lista::-webkit-scrollbar,
+.tabla-procesos::-webkit-scrollbar,
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.servicios-lista::-webkit-scrollbar-track,
+.tabla-procesos::-webkit-scrollbar-track,
+.modal-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.servicios-lista::-webkit-scrollbar-thumb,
+.tabla-procesos::-webkit-scrollbar-thumb,
+.modal-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.servicios-lista::-webkit-scrollbar-thumb:hover,
+.tabla-procesos::-webkit-scrollbar-thumb:hover,
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .config-container {
+    padding: 12px;
+  }
+
+  .main-layout {
+    gap: 16px;
+  }
+
+  .header-card mat-card-title {
+    font-size: 18px;
+  }
+
+  .servicio-header .header-content {
+    flex-direction: column;
+  }
+
+  .servicio-header .material-selector-header {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .procesos-table td,
+  .procesos-table th {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .acciones-buttons {
+    flex-direction: column;
+  }
+}
+/* ========== FORMULARIO SIMPLIFICADO ========== */
+.agregar-proceso-form-simple {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.proceso-select-full {
+  width: 100%;
+}
+
+.form-actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.btn-agregar-grande {
+  min-width: 200px;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .form-actions-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .btn-agregar-grande {
+    width: 100%;
+  }
+}

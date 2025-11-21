@@ -7,10 +7,8 @@ import { serviciosGuard } from '../guards/servicios.guards';
 import { LayoutComponent } from '../layout/layout/layout.component';
 
 export const routes: Routes = [
-  // 🔹 Redirección raíz → login
   { path: '', redirectTo: '/login', pathMatch: 'full' },
 
-  // 🔹 Login (página pública)
   {
     path: 'login',
     loadComponent: () =>
@@ -19,16 +17,14 @@ export const routes: Routes = [
       ),
   },
 
-  // 🔹 Rutas protegidas con Layout y AuthGuard
   {
     path: '',
     component: LayoutComponent,
     canActivate: [authGuard],
     children: [
-      // 🚀 Redirección por defecto (tras login) → órdenes para no-admin, servicios para admin
       { path: '', redirectTo: 'ordenes/lista', pathMatch: 'full' },
 
-      // 🔸 CRUD de Clientes (protegido con clientesGuard)
+      // ========== CRUD DE CLIENTES ==========
       {
         path: 'clientes',
         canActivate: [clientesGuard],
@@ -54,7 +50,7 @@ export const routes: Routes = [
           ),
       },
 
-      // 🔸 CRUD de Usuarios (protegido con usuariosGuard)
+      // ========== CRUD DE USUARIOS ==========
       {
         path: 'usuarios',
         canActivate: [usuariosGuard],
@@ -88,13 +84,11 @@ export const routes: Routes = [
           ),
       },
 
-      // 🔸 SERVICIOS Y COTIZACIONES (solo ADMINISTRADOR)
+      // ========== SERVICIOS Y COTIZACIONES ==========
       {
         path: 'servicios-cotizaciones',
         canActivate: [serviciosGuard],
         children: [
-          // 📌 SERVICIOS
-          // Lista de servicios (vista principal tras login)
           {
             path: 'servicios',
             loadComponent: () =>
@@ -102,8 +96,13 @@ export const routes: Routes = [
                 '../components/servicios-cotizaciones/admin/servicio-admin-list/servicio-admin-list.component'
               ).then((m) => m.ServicioAdminListComponent),
           },
-
-          // Dashboard del servicio (vista principal de configuración)
+          {
+            path: 'configuracion/servicio-procesos',
+            loadComponent: () =>
+              import(
+                '../components/servicios-cotizaciones/admin/servicio-procesos-config/servicio-procesos-config.component'
+              ).then((m) => m.ServicioProcesosConfigComponent),
+          },
           {
             path: 'servicios/:id/dashboard',
             loadComponent: () =>
@@ -114,12 +113,11 @@ export const routes: Routes = [
         ],
       },
 
-      // 🔸 MÓDULO DE ÓRDENES (accesible para ADMINISTRADOR, VENDEDOR, PRODUCCION, DISEÑADOR)
+      // ========== MÓDULO DE ÓRDENES ==========
       {
         path: 'ordenes',
         canActivate: [ordenesGuard],
         children: [
-          // 📌 ÓRDENES DE TRABAJO
           {
             path: 'lista',
             loadComponent: () =>
@@ -141,8 +139,6 @@ export const routes: Routes = [
                 (m) => m.OrdenDetailComponent
               ),
           },
-
-          // 📌 TURNOS
           {
             path: 'turnos',
             loadComponent: () =>
@@ -150,8 +146,6 @@ export const routes: Routes = [
                 (m) => m.TurnoListComponent
               ),
           },
-
-          // 📌 CAJAS DIARIAS
           {
             path: 'cajas',
             loadComponent: () =>
@@ -159,7 +153,6 @@ export const routes: Routes = [
                 (m) => m.CajaListComponent
               ),
           },
-          // ✅ NUEVO: Ruta de resumen/detalle de caja
           {
             path: 'cajas/resumen/:id',
             loadComponent: () =>
@@ -169,9 +162,18 @@ export const routes: Routes = [
           },
         ],
       },
+
+      // ========== TRACKING DE PRODUCCIÓN (SIMPLIFICADO) ==========
+      {
+        path: 'tracking',
+        canActivate: [ordenesGuard],
+        loadComponent: () =>
+          import('../components/ordenes/tracking/tracking-dashboard/tracking-dashboard.component').then(
+            (m) => m.TrackingDashboardComponent
+          ),
+      },
     ],
   },
 
-  // 🔹 Cualquier ruta no encontrada → redirigir a órdenes
   { path: '**', redirectTo: '/ordenes/lista' },
 ];

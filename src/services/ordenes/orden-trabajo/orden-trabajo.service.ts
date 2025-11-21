@@ -157,6 +157,47 @@ export interface ExtraServicioRequest {
   descripcion?: string;
 }
 
+// TRACKING: INTERFACES PARA ÓRDENES CON PROCESOS
+
+export interface OrdenConProcesosDTO {
+  idOrden: number;
+  numeroOrden: string;
+  nombreCliente: string;
+  nombreVendedor: string;
+  fRecepcion?: string;
+  fEntregaAcordada?: string;
+  totalFinal: number;
+  saldoPendiente: number;
+  estado: string;
+  esCotizacion: boolean;
+  detalles: DetalleConProcesosDTO[];
+}
+
+export interface DetalleConProcesosDTO {
+  idOrdenDetalle: number;
+  nombreServicio: string;
+  nombreMaterial: string;
+  nombreModelo?: string;
+  cantidad: number;
+  unidadMedida: string;
+  descripcion?: string;
+  estadoActual: string;
+  progresoPorcentaje: number;
+  procesos: ProcesoSimpleDTO[];
+}
+
+export interface ProcesoSimpleDTO {
+  idOrdenProceso: number;
+  nombreProceso: string;
+  estado: string;
+  orden: number;
+  bloqueado: boolean;
+  motivoBloqueo?: string;
+  fInicio?: string;
+  fFin?: string;
+  observaciones?: string;
+}
+
 // ========== SERVICE ==========
 
 @Injectable({
@@ -243,4 +284,10 @@ export class OrdenTrabajoService {
   interpretarTextoConIA(request: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/interpretar`, request);
   }
+  // MÉTODO PARA TRACKING 
+
+// obtenerOrdenesConProcesos - obtiene órdenes con detalles y procesos anidados
+obtenerOrdenesConProcesos(): Observable<OrdenConProcesosDTO[]> {
+  return this.http.get<OrdenConProcesosDTO[]>(`${this.apiUrl}/tracking`);
+}
 }

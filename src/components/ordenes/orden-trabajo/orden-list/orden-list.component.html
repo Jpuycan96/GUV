@@ -251,7 +251,11 @@
       <ng-container matColumnDef="estado">
         <th mat-header-cell *matHeaderCellDef>Estado</th>
         <td mat-cell *matCellDef="let orden">
-          <mat-chip [class]="getEstadoClass(orden.estado)">
+          <mat-chip 
+            [class]="getEstadoClass(orden.estado)"
+            (click)="irATracking(orden.idOrden, $event)"
+            class="chip-clickeable"
+            matTooltip="Ver tracking de esta orden">
             {{ getEstadoLabel(orden.estado) }}
           </mat-chip>
         </td>
