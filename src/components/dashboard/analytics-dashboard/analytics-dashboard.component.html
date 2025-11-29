@@ -6,26 +6,40 @@
       <p>Resumen de ventas y rendimiento del negocio</p>
     </div>
     
-    <div class="header-filters">
-      <mat-button-toggle-group [(ngModel)]="agrupacion" (change)="onFiltroChange()">
-        <mat-button-toggle value="dia">Día</mat-button-toggle>
-        <mat-button-toggle value="semana">Semana</mat-button-toggle>
-        <mat-button-toggle value="mes">Mes</mat-button-toggle>
-      </mat-button-toggle-group>
+    <div class="header-actions">
+      <div class="header-filters">
+        <mat-button-toggle-group [(ngModel)]="agrupacion" (change)="onFiltroChange()">
+          <mat-button-toggle value="dia">Día</mat-button-toggle>
+          <mat-button-toggle value="semana">Semana</mat-button-toggle>
+          <mat-button-toggle value="mes">Mes</mat-button-toggle>
+        </mat-button-toggle-group>
 
-      <mat-form-field appearance="outline" class="date-field">
-        <mat-label>Desde</mat-label>
-        <input matInput [matDatepicker]="pickerDesde" [(ngModel)]="fechaDesde" (dateChange)="onFiltroChange()">
-        <mat-datepicker-toggle matSuffix [for]="pickerDesde"></mat-datepicker-toggle>
-        <mat-datepicker #pickerDesde></mat-datepicker>
-      </mat-form-field>
+        <mat-form-field appearance="outline" class="date-field">
+          <mat-label>Desde</mat-label>
+          <input matInput [matDatepicker]="pickerDesde" [(ngModel)]="fechaDesde" (dateChange)="onFiltroChange()">
+          <mat-datepicker-toggle matSuffix [for]="pickerDesde"></mat-datepicker-toggle>
+          <mat-datepicker #pickerDesde></mat-datepicker>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline" class="date-field">
-        <mat-label>Hasta</mat-label>
-        <input matInput [matDatepicker]="pickerHasta" [(ngModel)]="fechaHasta" (dateChange)="onFiltroChange()">
-        <mat-datepicker-toggle matSuffix [for]="pickerHasta"></mat-datepicker-toggle>
-        <mat-datepicker #pickerHasta></mat-datepicker>
-      </mat-form-field>
+        <mat-form-field appearance="outline" class="date-field">
+          <mat-label>Hasta</mat-label>
+          <input matInput [matDatepicker]="pickerHasta" [(ngModel)]="fechaHasta" (dateChange)="onFiltroChange()">
+          <mat-datepicker-toggle matSuffix [for]="pickerHasta"></mat-datepicker-toggle>
+          <mat-datepicker #pickerHasta></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <!-- Botón Exportar PDF -->
+      <button mat-raised-button 
+              color="primary" 
+              class="btn-exportar"
+              (click)="exportarPDF()"
+              [disabled]="cargandoKPIs || exportandoPDF"
+              matTooltip="Exportar reporte a PDF">
+        <mat-icon *ngIf="!exportandoPDF">picture_as_pdf</mat-icon>
+        <mat-spinner *ngIf="exportandoPDF" diameter="20"></mat-spinner>
+        <span>{{ exportandoPDF ? 'Exportando...' : 'Exportar PDF' }}</span>
+      </button>
     </div>
   </div>
 
