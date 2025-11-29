@@ -22,7 +22,17 @@ export const routes: Routes = [
     component: LayoutComponent,
     canActivate: [authGuard],
     children: [
-      { path: '', redirectTo: 'ordenes/lista', pathMatch: 'full' },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+
+      // ========== DASHBOARD ANALÍTICO ==========
+      {
+        path: 'dashboard',
+        canActivate: [ordenesGuard],
+        loadComponent: () =>
+          import('../components/dashboard/analytics-dashboard/analytics-dashboard.component').then(
+            (m) => m.AnalyticsDashboardComponent
+          ),
+      },
 
       // ========== CRUD DE CLIENTES ==========
       {
@@ -163,7 +173,7 @@ export const routes: Routes = [
         ],
       },
 
-      // ========== TRACKING DE PRODUCCIÓN (SIMPLIFICADO) ==========
+      // ========== TRACKING DE PRODUCCIÓN ==========
       {
         path: 'tracking',
         canActivate: [ordenesGuard],
@@ -175,5 +185,5 @@ export const routes: Routes = [
     ],
   },
 
-  { path: '**', redirectTo: '/ordenes/lista' },
+  { path: '**', redirectTo: '/dashboard' },
 ];

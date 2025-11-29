@@ -1,0 +1,44 @@
+<mat-card class="ranking-card">
+  <mat-card-header>
+    <mat-card-title>{{ titulo }}</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="ranking-content">
+      <!-- Pie Chart -->
+      <div class="chart-section" *ngIf="mostrarGrafico && datos.length > 0">
+        <ngx-charts-pie-chart
+          [view]="view"
+          [results]="chartData"
+          [scheme]="colorScheme"
+          [legend]="false"
+          [labels]="true"
+          [doughnut]="true">
+        </ngx-charts-pie-chart>
+      </div>
+
+      <!-- Lista -->
+      <div class="list-section">
+        <div class="ranking-item" *ngFor="let servicio of datos; let i = index">
+          <div class="ranking-position">{{ i + 1 }}</div>
+          <div class="ranking-info">
+            <span class="ranking-nombre">{{ servicio.nombreServicio }}</span>
+            <div class="ranking-stats">
+              <span class="cantidad">{{ servicio.cantidadVendida }} ventas</span>
+              <span class="monto">S/ {{ servicio.montoTotal | number:'1.2-2' }}</span>
+            </div>
+            <mat-progress-bar 
+              mode="determinate" 
+              [value]="servicio.porcentajeDelTotal"
+              [color]="i < 3 ? 'primary' : 'accent'">
+            </mat-progress-bar>
+          </div>
+          <div class="ranking-porcentaje">{{ servicio.porcentajeDelTotal | number:'1.1-1' }}%</div>
+        </div>
+
+        <div *ngIf="datos.length === 0" class="no-data">
+          <p>No hay datos disponibles</p>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

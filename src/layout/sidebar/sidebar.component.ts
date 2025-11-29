@@ -46,9 +46,9 @@ export class SidebarComponent {
     {
       label: 'Dashboard',
       icon: 'dashboard',
-      route: '/servicios-cotizaciones/servicios',
+      route: '/dashboard',
       color: 'primary',
-      requierePermiso: { modulo: 'servicios', accion: 'ver' }
+      requierePermiso: { modulo: 'ordenes', accion: 'ver' }
     },
     {
       label: 'Servicios',
@@ -112,7 +112,6 @@ export class SidebarComponent {
         }
       ]
     },
-    // ========== TRACKING DE PRODUCCIÓN (SIMPLIFICADO) ==========
     {
       label: 'Tracking Producción',
       icon: 'track_changes',

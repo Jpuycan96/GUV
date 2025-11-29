@@ -1,0 +1,41 @@
+<mat-card class="ranking-card">
+  <mat-card-header>
+    <mat-card-title>{{ titulo }}</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="vendedores-list">
+      <div class="vendedor-item" *ngFor="let vendedor of datos; let i = index" [ngClass]="{'top-3': i < 3}">
+        <div class="vendedor-position">
+          <span class="medalla" *ngIf="i < 3">{{ getMedalla(i) }}</span>
+          <span class="numero" *ngIf="i >= 3">{{ i + 1 }}</span>
+        </div>
+        
+        <div class="vendedor-avatar">
+          <mat-icon>person</mat-icon>
+        </div>
+        
+        <div class="vendedor-info">
+          <span class="vendedor-nombre">{{ vendedor.nombreVendedor }}</span>
+          <div class="vendedor-stats">
+            <span><mat-icon>receipt_long</mat-icon> {{ vendedor.cantidadOrdenes }} órdenes</span>
+            <span><mat-icon>payments</mat-icon> S/ {{ vendedor.ticketPromedio | number:'1.2-2' }} prom.</span>
+          </div>
+          <mat-progress-bar 
+            mode="determinate" 
+            [value]="vendedor.porcentajeDelTotal">
+          </mat-progress-bar>
+        </div>
+        
+        <div class="vendedor-monto">
+          <span class="monto">S/ {{ vendedor.montoTotalVendido | number:'1.2-2' }}</span>
+          <span class="porcentaje">{{ vendedor.porcentajeDelTotal | number:'1.1-1' }}%</span>
+        </div>
+      </div>
+
+      <div *ngIf="datos.length === 0" class="no-data">
+        <mat-icon>people_outline</mat-icon>
+        <p>No hay datos de vendedores</p>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

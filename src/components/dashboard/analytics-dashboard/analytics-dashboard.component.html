@@ -1,0 +1,164 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-title">
+      <h1>Dashboard Analítico</h1>
+      <p>Resumen de ventas y rendimiento del negocio</p>
+    </div>
+    
+    <div class="header-filters">
+      <mat-button-toggle-group [(ngModel)]="agrupacion" (change)="onFiltroChange()">
+        <mat-button-toggle value="dia">Día</mat-button-toggle>
+        <mat-button-toggle value="semana">Semana</mat-button-toggle>
+        <mat-button-toggle value="mes">Mes</mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <mat-form-field appearance="outline" class="date-field">
+        <mat-label>Desde</mat-label>
+        <input matInput [matDatepicker]="pickerDesde" [(ngModel)]="fechaDesde" (dateChange)="onFiltroChange()">
+        <mat-datepicker-toggle matSuffix [for]="pickerDesde"></mat-datepicker-toggle>
+        <mat-datepicker #pickerDesde></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="date-field">
+        <mat-label>Hasta</mat-label>
+        <input matInput [matDatepicker]="pickerHasta" [(ngModel)]="fechaHasta" (dateChange)="onFiltroChange()">
+        <mat-datepicker-toggle matSuffix [for]="pickerHasta"></mat-datepicker-toggle>
+        <mat-datepicker #pickerHasta></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- KPIs Grid -->
+  <div class="kpis-grid" *ngIf="!cargandoKPIs && kpis">
+    <app-kpi-card
+      titulo="Ventas Hoy"
+      [valor]="kpis.ventasHoy"
+      icono="today"
+      color="primary"
+      formato="moneda">
+    </app-kpi-card>
+
+    <app-kpi-card
+      titulo="Ventas Semana"
+      [valor]="kpis.ventasSemana"
+      icono="date_range"
+      color="success"
+      formato="moneda"
+      [variacion]="kpis.variacionVsSemanaAnterior">
+    </app-kpi-card>
+
+    <app-kpi-card
+      titulo="Ventas Mes"
+      [valor]="kpis.ventasMes"
+      icono="calendar_month"
+      color="info"
+      formato="moneda"
+      [variacion]="kpis.variacionVsMesAnterior">
+    </app-kpi-card>
+
+    <app-kpi-card
+      titulo="Ticket Promedio"
+      [valor]="kpis.ticketPromedio"
+      icono="receipt"
+      color="warning"
+      formato="moneda">
+    </app-kpi-card>
+
+    <app-kpi-card
+      titulo="Órdenes en Proceso"
+      [valor]="kpis.ordenesEnProceso"
+      icono="pending_actions"
+      color="primary"
+      formato="numero">
+    </app-kpi-card>
+
+    <app-kpi-card
+      titulo="Pendientes de Pago"
+      [valor]="kpis.ordenesPendientesPago"
+      icono="payments"
+      color="danger"
+      formato="numero">
+    </app-kpi-card>
+
+    <app-kpi-card
+      titulo="Tasa Completado"
+      [valor]="kpis.tasaCompletado"
+      icono="check_circle"
+      color="success"
+      formato="porcentaje">
+    </app-kpi-card>
+
+    <app-kpi-card
+      titulo="Hora Pico"
+      [valor]="ventasHoraPico"
+      icono="schedule"
+      color="info"
+      formato="moneda"
+      [subtitulo]="horaPico">
+    </app-kpi-card>
+  </div>
+
+  <!-- Loading KPIs -->
+  <div class="loading-container" *ngIf="cargandoKPIs">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Cargando indicadores...</p>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-section">
+    <!-- Ventas por Período -->
+    <div class="chart-container">
+      <app-ventas-chart
+        *ngIf="!cargandoVentas && ventasPorPeriodo"
+        [datos]="ventasPorPeriodo.datos"
+        [titulo]="'Ventas por ' + agrupacion"
+        tipo="linea">
+      </app-ventas-chart>
+      <div class="loading-container" *ngIf="cargandoVentas">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    </div>
+
+    <!-- Ventas por Hora -->
+    <div class="chart-container">
+      <app-ventas-chart
+        *ngIf="!cargandoHoraPico && ventasPorHora"
+        [datos]="ventasPorHora.datos"
+        titulo="Ventas por Hora del Día"
+        tipo="barras">
+      </app-ventas-chart>
+      <div class="loading-container" *ngIf="cargandoHoraPico">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rankings Section -->
+  <div class="rankings-section">
+    <!-- Servicios Top -->
+    <div class="ranking-container">
+      <app-servicios-ranking
+        *ngIf="!cargandoServicios"
+        [datos]="serviciosTop"
+        titulo="Servicios Más Vendidos"
+        [mostrarGrafico]="true">
+      </app-servicios-ranking>
+      <div class="loading-container" *ngIf="cargandoServicios">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    </div>
+
+    <!-- Vendedores Ranking -->
+    <div class="ranking-container">
+      <app-vendedores-ranking
+        *ngIf="!cargandoVendedores"
+        [datos]="rankingVendedores"
+        titulo="Ranking de Vendedores">
+      </app-vendedores-ranking>
+      <div class="loading-container" *ngIf="cargandoVendedores">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    </div>
+  </div>
+</div>

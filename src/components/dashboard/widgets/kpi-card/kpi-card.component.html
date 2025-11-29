@@ -1,0 +1,25 @@
+<mat-card class="kpi-card" [ngClass]="color">
+  <mat-card-content>
+    <div class="kpi-header">
+      <div class="kpi-icon" [ngClass]="color + '-bg'">
+        <mat-icon>{{ icono }}</mat-icon>
+      </div>
+      <div class="kpi-variacion" *ngIf="variacion !== undefined" [ngClass]="variacion >= 0 ? 'positivo' : 'negativo'">
+        <mat-icon>{{ variacion >= 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+        <span>{{ variacion | number:'1.1-1' }}%</span>
+      </div>
+    </div>
+    
+    <div class="kpi-body">
+      <h3 class="kpi-titulo">{{ titulo }}</h3>
+      <p class="kpi-valor">
+        <ng-container [ngSwitch]="formato">
+          <span *ngSwitchCase="'moneda'">S/ {{ valor | number:'1.2-2' }}</span>
+          <span *ngSwitchCase="'porcentaje'">{{ valor | number:'1.1-1' }}%</span>
+          <span *ngSwitchDefault>{{ valor | number:'1.0-0' }}</span>
+        </ng-container>
+      </p>
+      <p class="kpi-subtitulo" *ngIf="subtitulo">{{ subtitulo }}</p>
+    </div>
+  </mat-card-content>
+</mat-card>

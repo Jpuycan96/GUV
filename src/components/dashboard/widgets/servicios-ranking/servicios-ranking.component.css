@@ -1,0 +1,70 @@
+.ranking-card {
+  border-radius: 12px;
+  height: 100%;
+}
+
+.ranking-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.chart-section {
+  display: flex;
+  justify-content: center;
+}
+
+.ranking-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.ranking-item:last-child {
+  border-bottom: none;
+}
+
+.ranking-position {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.ranking-info {
+  flex: 1;
+}
+
+.ranking-nombre {
+  font-weight: 600;
+  color: #1e293b;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.ranking-stats {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.ranking-porcentaje {
+  font-weight: 600;
+  color: #667eea;
+}
+
+.no-data {
+  text-align: center;
+  color: #94a3b8;
+  padding: 40px;
+}
