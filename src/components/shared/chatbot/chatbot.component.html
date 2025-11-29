@@ -1,0 +1,77 @@
+<!-- Botón flotante -->
+<button class="chatbot-fab" (click)="toggleChat()" [class.abierto]="abierto">
+  <mat-icon *ngIf="!abierto">chat</mat-icon>
+  <mat-icon *ngIf="abierto">close</mat-icon>
+</button>
+
+<!-- Ventana del chat -->
+<div class="chatbot-window" [class.abierto]="abierto">
+  
+  <!-- Header -->
+  <div class="chatbot-header">
+    <div class="header-info">
+      <div class="avatar">
+        <mat-icon>smart_toy</mat-icon>
+      </div>
+      <div class="header-text">
+        <span class="titulo">Asistente GUV</span>
+        <span class="estado">● En línea</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button mat-icon-button (click)="limpiarHistorial()" matTooltip="Limpiar historial">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button (click)="toggleChat()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mensajes -->
+  <div class="chatbot-messages" #chatContainer>
+    <div *ngFor="let mensaje of mensajes" 
+         class="mensaje" 
+         [class.usuario]="mensaje.esUsuario"
+         [class.bot]="!mensaje.esUsuario">
+      <div class="mensaje-contenido">
+        <p>{{ mensaje.texto }}</p>
+        <span class="mensaje-hora">{{ mensaje.hora }}</span>
+      </div>
+    </div>
+
+    <!-- Indicador escribiendo -->
+    <div class="mensaje bot" *ngIf="escribiendo">
+      <div class="mensaje-contenido escribiendo">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="chatbot-input">
+    <input 
+      #inputMensaje
+      type="text" 
+      [(ngModel)]="mensajeUsuario" 
+      (keypress)="onKeyPress($event)"
+      placeholder="Escribe tu mensaje..."
+      [disabled]="escribiendo">
+    <button mat-icon-button 
+            (click)="enviarMensaje()" 
+            [disabled]="!mensajeUsuario.trim() || escribiendo"
+            class="btn-enviar">
+      <mat-icon>send</mat-icon>
+    </button>
+  </div>
+
+  <!-- Footer -->
+  <div class="chatbot-footer">
+    <button mat-button (click)="limpiarHistorial()">
+      <mat-icon>delete_outline</mat-icon>
+      Limpiar historial
+    </button>
+  </div>
+</div>
